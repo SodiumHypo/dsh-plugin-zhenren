@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactElement } from 're
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
 import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
 import { parseInscribeMeta, type InscribePresentationMeta } from '../../contract.js'
-import { drawCarvedGlyph, drawPlaceholder } from '../render/carve.js'
+import { drawCarvedGlyph, drawGlyphGhost, drawPlaceholder } from '../render/carve.js'
 import { drawOmen } from '../render/cracks.js'
 import { drawShell } from '../render/shell.js'
 import { carveFrame, carveTotalMs } from '../render/timeline.js'
@@ -109,6 +109,20 @@ function InscribeCard(props: { meta: InscribePresentationMeta; t: InscribeRowPro
 
       const progress = carveFrame(meta.carve.chars, elapsedMs)
       const unit = Math.min(width, height)
+      // The whole inscription is faintly legible before the first stroke; the
+      // chisel then darkens each slot in turn.
+      for (const glyph of meta.glyphs) {
+        if (!glyph.found || glyph.glyphChar === null) continue
+        const slot = slots.get(glyph.slot)
+        if (slot === undefined) continue
+        drawGlyphGhost(ctx, {
+          char: glyph.glyphChar,
+          x: slot.x * width,
+          y: slot.y * height,
+          size: slot.size * unit,
+          fontFamily: ORACLE_FONT_FAMILY,
+        })
+      }
       for (const glyph of meta.glyphs) {
         const slot = slots.get(glyph.slot)
         if (slot === undefined) continue

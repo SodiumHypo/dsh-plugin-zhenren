@@ -9,6 +9,7 @@ import { createRng } from '../../shared/rng.js'
 
 const CARVE_INK = 'rgba(38, 28, 20, 0.92)'
 const CARVE_EDGE = 'rgba(250, 242, 226, 0.35)'
+const GHOST_INK = 'rgba(74, 58, 40, 0.16)'
 const PLACEHOLDER_INK = 'rgba(96, 78, 56, 0.28)'
 
 export interface CarvedGlyphInput {
@@ -57,6 +58,27 @@ function revealClip(
   }
   ctx.lineTo(left - band * 0.2, top - band * 0.4)
   ctx.closePath()
+}
+
+/**
+ * A faint guide cut for a slot that has not been carved yet.
+ *
+ * Without it the shell looks blank for the first second and the carving reads
+ * as "nothing happened". The dark incision then fills the guide in slot by
+ * slot; this is a layout affordance, not a claim about stroke order.
+ */
+export function drawGlyphGhost(
+  ctx: CanvasRenderingContext2D,
+  input: { char: string; x: number; y: number; size: number; fontFamily: string },
+): void {
+  if (input.char === '') return
+  ctx.save()
+  ctx.font = `${input.size}px "${input.fontFamily}"`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = GHOST_INK
+  ctx.fillText(input.char, input.x, input.y)
+  ctx.restore()
 }
 
 /** A real glyph, revealed by the chisel mask. */

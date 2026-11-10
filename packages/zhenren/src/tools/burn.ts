@@ -14,6 +14,7 @@ import type { OracleIndex } from '../data/load.js'
 import { splitHanCharacters } from '../data/lookup.js'
 import { chooseAuspice } from '../ritual/auspice.js'
 import { deriveReading, generateCracks, pickBurnPoint } from '../ritual/crack.js'
+import { canonicalPrefix, dayGanzhi } from '../ritual/ganzhi.js'
 import { planGlyphs, toChargeGlyphs } from '../ritual/glyph-plan.js'
 import { generateSeed } from '../ritual/random.js'
 import { isSeed } from '../shared/rng.js'
@@ -54,6 +55,8 @@ const BURN_OUTPUT = {
     seed: { type: 'string', required: true },
     question: { type: 'string', required: true },
     charge: { type: 'string', required: true },
+    dayGanzhi: { type: 'string', required: true },
+    prefix: { type: 'string', required: true },
     auspice: { type: 'string', enum: ['吉', '凶', '中性'], required: true },
     reading: {
       required: true,
@@ -83,7 +86,8 @@ const DESCRIPTION =
   '灼龟取兆。贞人先在龟甲上灼出兆纹，再由兆纹定出这一次占卜唯一的吉凶（auspice）。'
   + `命辞（charge）不超过 ${MAX_CHARGE_CHARS} 字。`
   + '调用之前不要描述裂纹、不要宣布吉凶；调用之后必须以本工具返回的 auspice 写占辞，不得改写或反转。'
-  + '若命辞含字库外的字，missing 会列出它们；灼龟仍会完成，你可以在刻辞时改写或接受空刻。'
+  + '返回的 prefix 是系统按当日干支固定的前辞（如「戊子卜，鱼贞：」），刻辞时不要自己另写前辞。'
+  + '若命辞含字库外的字，missing 会列出它们；灼龟仍会完成。先换字或省略，把命辞改写成库内字的单字表达，再进入刻辞；空刻是最后手段。'
 
 /** Build the burn tool bound to one loaded corpus and config. */
 export function createBurnTool(deps: BurnDeps) {
@@ -126,6 +130,9 @@ export function createBurnTool(deps: BurnDeps) {
       render(_args, value): ContentBlock[] {
         const lines = [
           `贞人灼龟，兆象：${value.auspice}。`,
+          `divinationId: ${value.divinationId}`,
+          `seed: ${value.seed}`,
+          `前辞：${value.prefix}`,
           `命辞：${value.charge}`,
         ]
         if (value.missing.length > 0) {
@@ -147,6 +154,8 @@ export function createBurnTool(deps: BurnDeps) {
           seed: value.seed,
           question: value.question,
           charge: value.charge,
+          dayGanzhi: value.dayGanzhi,
+          prefix: value.prefix,
           auspice: value.auspice as Auspice,
           burnPoint: value.burnPoint,
           shellSeed: `shell-${value.seed}`,
@@ -181,6 +190,9 @@ export function createBurnTool(deps: BurnDeps) {
       }
 
       const seed = args.seed ?? generateSeed()
+      const now = new Date()
+      const ganzhi = dayGanzhi(now)
+      const prefix = canonicalPrefix(now, config.divinerName)
       const auspice = chooseAuspice(seed, args.tone, config.auspiceBalance)
       const burnPoint = pickBurnPoint(seed, args.burnPoint)
       const cracks = generateCracks({ seed, auspice, burnPoint })
@@ -204,6 +216,8 @@ export function createBurnTool(deps: BurnDeps) {
         seed,
         question,
         charge,
+        dayGanzhi: ganzhi,
+        prefix,
         auspice,
         reading,
         burnPoint,

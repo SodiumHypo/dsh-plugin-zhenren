@@ -8,3 +8,9 @@ Thumbs.db
 
 # Reference snapshots are build inputs, not repository content (237 MB).
 .refs/
+
+# Local verification artifacts (screenshots, Playwright snapshots, pack output).
+.playwright-mcp/
+/*.png
+/*.yml
+packages/zhenren/*.tgz

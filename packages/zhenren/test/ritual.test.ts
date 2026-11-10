@@ -284,4 +284,22 @@ describe('layout', () => {
     if (left === null || right === null) return
     expect((left.slots[0] as { x: number }).x).toBeLessThan((right.slots[0] as { x: number }).x)
   })
+
+  it('advances left-to-right when the diviner chooses ltr', () => {
+    const layout = computeLayout({
+      count: 6,
+      requestedColumns: 3,
+      bounds: DEFAULT_BOUNDS,
+      direction: 'ltr',
+    })
+    expect(layout?.direction).toBe('ltr')
+    if (layout === null) return
+    const first = layout.slots[0]
+    const nextColumn = layout.slots.find((slot) => slot.column === 1)
+    expect(first?.x).toBeLessThan(nextColumn?.x ?? 0)
+    for (const slot of layout.slots) {
+      expect(slot.x).toBeGreaterThanOrEqual(DEFAULT_BOUNDS.x)
+      expect(slot.x).toBeLessThanOrEqual(DEFAULT_BOUNDS.x + DEFAULT_BOUNDS.w)
+    }
+  })
 })

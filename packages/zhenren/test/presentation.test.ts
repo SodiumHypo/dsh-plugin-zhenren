@@ -15,6 +15,7 @@ import {
   parseInscribeMeta,
 } from '../src/contract.js'
 import { resolveConfig } from '../src/config.js'
+import { dictionaries } from '../src/client/locale.js'
 import { loadOracleIndex, type OracleIndex } from '../src/data/load.js'
 import { generateCracks } from '../src/ritual/crack.js'
 import { createBurnTool } from '../src/tools/burn.js'
@@ -26,6 +27,26 @@ const index: OracleIndex = loadOracleIndex({ dataDir })
 
 const EXEC = {} as never
 const CONFIG = resolveConfig()
+
+describe('card footer', () => {
+  it('shows the boundary sentence exactly once', () => {
+    const boundary = dictionaries.zh['card.boundary']
+    expect(boundary.length).toBeGreaterThan(0)
+    // The attribution line carries sources only; the locale owns the boundary.
+    expect(ATTRIBUTION).not.toContain(boundary)
+    const footer = `${ATTRIBUTION}\n${boundary}`
+    expect(footer.match(/兆纹为艺术化表现/g)).toHaveLength(1)
+  })
+
+  it('strips the legacy boundary suffix from restored v1 metas', async () => {
+    const tool = createBurnTool({ getIndex: () => index, config: CONFIG, memory: createDivinationMemory() })
+    const args = { question: 'q', charge: '贞', seed: 'meta-legacy' }
+    const value = (await tool.execute(args, EXEC)) as unknown as BurnValue
+    const raw = tool.output.presentationMeta?.(args, value as never) as Record<string, unknown>
+    const legacy = { ...raw, attribution: `${ATTRIBUTION}${dictionaries.zh['card.boundary']}` }
+    expect(parseBurnMeta(legacy)?.attribution).toBe(ATTRIBUTION)
+  })
+})
 
 interface BurnValue {
   divinationId: string
@@ -191,6 +212,12 @@ describe('inscribe presentationMeta', () => {
     expect(parsed?.glyphs[0]?.placeholder).toBe(true)
     expect(parsed?.animation).toBe('full')
     expect(parsed?.showShuowen).toBe(true)
+
+    const ltr = parseInscribeMeta({
+      ...minimal,
+      layout: { ...minimal.layout, direction: 'ltr' },
+    })
+    expect(ltr?.layout.direction).toBe('ltr')
 
     const badSlot = {
       ...minimal,

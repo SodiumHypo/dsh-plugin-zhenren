@@ -46,8 +46,13 @@ export function RitualCanvas(props: RitualCanvasProps): ReactElement {
   drawRef.current = props.draw
 
   const [size, setSize] = useState({ width: 0, height: 0 })
-  const [onScreen, setOnScreen] = useState(true)
-  const [pageVisible, setPageVisible] = useState(true)
+  // Start hidden: the first intersection report decides when the clock may
+  // run. Initializing to `true` lets a card that mounts below the fold burn
+  // its whole timeline before the viewer ever sees it.
+  const [onScreen, setOnScreen] = useState(() => typeof IntersectionObserver === 'undefined')
+  const [pageVisible, setPageVisible] = useState(
+    () => typeof document === 'undefined' || !document.hidden,
+  )
   const elapsedRef = useRef(0)
   const { replayKey } = props
 
@@ -114,10 +119,15 @@ export function RitualCanvas(props: RitualCanvasProps): ReactElement {
       drawRef.current(ctx, width, height, elapsedMs)
     }
 
-    if (!animate || prefersReducedMotion() || !onScreen || !pageVisible) {
-      // Paused or static: show the frame the viewer should see right now.
-      const elapsed = Math.min(elapsedRef.current, durationMs)
-      paint(animate && elapsed > 0 ? elapsed : durationMs)
+    if (!animate || prefersReducedMotion()) {
+      paint(durationMs)
+      return
+    }
+    if (!onScreen || !pageVisible) {
+      // Paused before or during the ritual: hold the frame the viewer last
+      // reached. A card that has never been visible stays at frame zero
+      // instead of being pre-drawn to its final state.
+      paint(Math.min(elapsedRef.current, durationMs))
       return
     }
 

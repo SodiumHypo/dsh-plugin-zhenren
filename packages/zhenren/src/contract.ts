@@ -13,9 +13,27 @@ export const TOOL_INSCRIBE = 'zhenren_inscribe'
 /** Presentation-meta version understood by this build. */
 export const META_VERSION = 1
 
-/** Attribution line shown in card footers and returned to the model. */
+/**
+ * Source attribution returned to the model and shown in card footers.
+ * The boundary sentence ("兆纹为艺术化表现……") is product copy owned by the
+ * locale dictionary (`card.boundary`), so it must not be duplicated here.
+ */
 export const ATTRIBUTION =
-  '字形：Oracular（OFL-1.1）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。兆纹为艺术化表现，非考古复原。'
+  '字形：Oracular（OFL-1.1）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。'
+
+/**
+ * Early v1 metas appended the boundary sentence to `attribution`, while the
+ * card also renders the locale `card.boundary` line. Strip the legacy suffix
+ * on read so restored sessions do not show the sentence twice.
+ */
+const LEGACY_BOUNDARY_SUFFIX = '兆纹为艺术化表现，非考古复原。'
+
+function normalizeAttribution(value: string): string {
+  const trimmed = value.trimEnd()
+  return trimmed.endsWith(LEGACY_BOUNDARY_SUFFIX)
+    ? trimmed.slice(0, -LEGACY_BOUNDARY_SUFFIX.length).trimEnd()
+    : value
+}
 
 /** The single authoritative omen. Derived once per divination by the host. */
 export type Auspice = '吉' | '凶' | '中性'
@@ -134,6 +152,10 @@ export type BurnPresentationMeta = {
   seed: string
   question: string
   charge: string
+  /** Day's 干支 at burn time; used by the fixed 前辞 opening. */
+  dayGanzhi: string
+  /** Canonical opening, e.g. `戊子卜，鱼贞：`. */
+  prefix: string
   auspice: Auspice
   burnPoint: { x: number; y: number }
   shellSeed: string
@@ -157,7 +179,7 @@ export type InscribePresentationMeta = {
   auspice: Auspice | null
   cracks: CrackSpec | null
   glyphs: MetaGlyph[]
-  layout: { columns: number; direction: 'rtl'; slots: MetaSlot[] }
+  layout: { columns: number; direction: 'ltr' | 'rtl'; slots: MetaSlot[] }
   carve: { version: 1; chars: CarveStep[] }
   highlightGlosses: HighlightGloss[]
   animation: AnimationLevel
@@ -277,6 +299,8 @@ export function parseBurnMeta(value: unknown): BurnPresentationMeta | null {
     seed,
     question,
     charge,
+    dayGanzhi: typeof value.dayGanzhi === 'string' ? value.dayGanzhi : '',
+    prefix: typeof value.prefix === 'string' ? value.prefix : '',
     auspice: value.auspice,
     burnPoint: { x: value.burnPoint.x, y: value.burnPoint.y },
     shellSeed,
@@ -284,7 +308,7 @@ export function parseBurnMeta(value: unknown): BurnPresentationMeta | null {
     animation: readAnimation(value.animation),
     showShuowen: readShowShuowen(value.showShuowen),
     locale: readLocale(value.locale),
-    attribution,
+    attribution: normalizeAttribution(attribution),
   }
 }
 
@@ -324,7 +348,7 @@ export function parseInscribeMeta(value: unknown): InscribePresentationMeta | nu
 
   if (!isObject(value.layout) || !Array.isArray(value.layout.slots)) return null
   if (typeof value.layout.columns !== 'number') return null
-  if (value.layout.direction !== 'rtl') return null
+  if (value.layout.direction !== 'rtl' && value.layout.direction !== 'ltr') return null
   const slots: MetaSlot[] = []
   for (const entry of value.layout.slots) {
     if (!isObject(entry)) return null
@@ -383,12 +407,12 @@ export function parseInscribeMeta(value: unknown): InscribePresentationMeta | nu
     auspice: isAuspice(value.auspice) ? value.auspice : null,
     cracks: parseCrackSpec(value.cracks),
     glyphs,
-    layout: { columns: value.layout.columns, direction: 'rtl', slots },
+    layout: { columns: value.layout.columns, direction: value.layout.direction, slots },
     carve: { version: 1, chars },
     highlightGlosses,
     animation: readAnimation(value.animation),
     showShuowen: readShowShuowen(value.showShuowen),
     locale: readLocale(value.locale),
-    attribution,
+    attribution: normalizeAttribution(attribution),
   }
 }

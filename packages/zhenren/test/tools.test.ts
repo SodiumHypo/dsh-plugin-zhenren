@@ -11,9 +11,11 @@ import type { Auspice, OmenReading } from '../src/contract.js'
 import type { ShuowenGloss } from '../src/data/schema.js'
 import { resolveConfig, type Config } from '../src/config.js'
 import { loadOracleIndex, type OracleIndex } from '../src/data/load.js'
+import { splitHanCharacters } from '../src/data/lookup.js'
 import { createBurnTool } from '../src/tools/burn.js'
 import { createInscribeTool } from '../src/tools/inscribe.js'
 import { createDivinationMemory, isDivinationId } from '../src/tools/shared.js'
+import { canonicalPrefix } from '../src/ritual/ganzhi.js'
 
 const dataDir = fileURLToPath(new URL('../data', import.meta.url))
 const index: OracleIndex = loadOracleIndex({ dataDir })
@@ -23,6 +25,8 @@ interface BurnValue {
   seed: string
   question: string
   charge: string
+  dayGanzhi: string
+  prefix: string
   auspice: Auspice
   reading: OmenReading
   burnPoint: { x: number; y: number }
@@ -52,6 +56,7 @@ interface InscribeGlyph {
 interface InscribeValue {
   ok: boolean
   divinationId: string | null
+  prefix: string
   missing: string[]
   glyphs: InscribeGlyph[]
   layoutSummary: string
@@ -62,6 +67,11 @@ interface InscribeValue {
 }
 
 const EXEC = {} as never
+
+/** Glyphs drop the punctuation in the 前辞; compare Han characters only. */
+function hanOnly(text: string): string {
+  return splitHanCharacters(text).join('')
+}
 
 function burnTool(config: Config = {}) {
   return createBurnTool({ getIndex: () => index, config: resolveConfig(config), memory: createDivinationMemory() })
@@ -87,7 +97,11 @@ const CHARGE = '贞：今其出，亡咎？'
 
 describe('zhenren_burn', () => {
   it('returns one authoritative omen and the 命辞 glyph report', async () => {
-    const value = await burn({ question: '近期是否适合出行？', charge: CHARGE, seed: 'seed-a' })
+    const tool = burnTool()
+    const value = (await tool.execute(
+      { question: '近期是否适合出行？', charge: CHARGE, seed: 'seed-a' },
+      EXEC,
+    )) as BurnValue
     expect(isDivinationId(value.divinationId)).toBe(true)
     expect(value.seed).toBe('seed-a')
     expect(['吉', '凶', '中性']).toContain(value.auspice)
@@ -97,7 +111,16 @@ describe('zhenren_burn', () => {
     expect(value.missing).toEqual([])
     expect(value.burnPoint.x).toBeGreaterThanOrEqual(0)
     expect(value.burnPoint.x).toBeLessThanOrEqual(1)
+    expect(value.prefix).toBe(canonicalPrefix(new Date(), '鱼'))
+    expect(value.prefix).toMatch(/^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]卜，鱼贞：$/)
     expect(value.attribution).toContain('OFL-1.1')
+    // The model only sees `render`; it must carry the join keys for inscribe.
+    const rendered = (tool.output.render({} as never, value as never) as { type: string; text: string }[])
+      .map((block) => block.text)
+      .join('\n')
+    expect(rendered).toContain(value.divinationId)
+    expect(rendered).toContain(value.seed)
+    expect(rendered).toContain(value.prefix)
   })
 
   it('replays the omen for the same seed', async () => {
@@ -150,11 +173,41 @@ describe('zhenren_inscribe', () => {
     })
     expect(value.ok).toBe(true)
     expect(value.error).toBeNull()
-    expect(value.glyphs.map((glyph) => glyph.char)).toEqual(['贞', '今', '其', '出', '其', '吉'])
-    expect(value.glyphs.map((glyph) => glyph.slot)).toEqual([0, 1, 2, 3, 4, 5])
+    expect(value.prefix).toBe(canonicalPrefix(new Date(), '鱼'))
+    // The model-supplied `prefix` is ignored; the host opening comes first.
+    expect(value.glyphs.map((glyph) => glyph.char).join('')).toBe(`${hanOnly(value.prefix)}今其出其吉`)
+    expect(value.glyphs.map((glyph) => glyph.char).slice(-5)).toEqual(['今', '其', '出', '其', '吉'])
+    expect(value.glyphs.map((glyph) => glyph.slot)).toEqual(value.glyphs.map((_, index) => index))
     expect(value.layoutSummary).toMatch(/right-to-left/)
     expect(value.warnings.length).toBe(1)
     expect(value.continuity).toBeNull()
+  })
+
+  it('lets the model choose the column direction', async () => {
+    const base = {
+      divinationId: 'div_abcdef',
+      burnSeed: 'seed-direction',
+      inscription: { charge: '今其出', prognosis: '其吉。' },
+    }
+    const ltr = await inscribe({ ...base, layout: { columns: 2, direction: 'ltr' } })
+    const rtl = await inscribe({ ...base, layout: { columns: 2, direction: 'rtl' } })
+    expect(ltr.layoutSummary).toMatch(/left-to-right/)
+    expect(rtl.layoutSummary).toMatch(/right-to-left/)
+
+    const tool = inscribeTool()
+    const metaOf = (args: Record<string, unknown>, value: InscribeValue) => {
+      return tool.output.presentationMeta?.(args as never, value as never) as {
+        layout: { direction: 'ltr' | 'rtl'; slots: Array<{ x: number }> }
+      }
+    }
+    const ltrMeta = metaOf({ ...base, layout: { columns: 2, direction: 'ltr' } }, ltr)
+    const rtlMeta = metaOf({ ...base, layout: { columns: 2, direction: 'rtl' } }, rtl)
+    expect(ltrMeta.layout.direction).toBe('ltr')
+    expect(rtlMeta.layout.direction).toBe('rtl')
+    const ltrX = ltrMeta.layout.slots[0]?.x ?? -1
+    const rtlX = rtlMeta.layout.slots[0]?.x ?? -1
+    expect(ltrX).toBeGreaterThanOrEqual(0)
+    expect(ltrX).toBeLessThan(rtlX)
   })
 
   it('joins the burn card when the process still remembers the divination', async () => {
@@ -208,12 +261,24 @@ describe('zhenren_inscribe', () => {
       highlight: ['咎'],
     })
     expect(value.ok).toBe(true)
+    expect(value.glyphs.map((glyph) => glyph.char).join('')).toBe(`${hanOnly(value.prefix)}亡咎吉`)
     const glossed = value.glyphs.filter((glyph) => glyph.shuowen !== null && glyph.shuowen !== undefined)
     expect(glossed.map((glyph) => glyph.char)).toEqual(['咎'])
     expect(glossed[0]?.glossFound).toBe(true)
     for (const glyph of value.glyphs) {
       if (glyph.char !== '咎') expect(glyph.shuowen ?? null).toBeNull()
     }
+  })
+
+  it('ignores a model-supplied prefix and fixes the opening', async () => {
+    const value = await inscribe({
+      divinationId: 'div_abcdef',
+      burnSeed: 'seed-l',
+      inscription: { prefix: '癸卯卜，某某贞：', charge: '其雨', prognosis: '吉' },
+    })
+    expect(value.ok).toBe(true)
+    expect(value.prefix).toBe(canonicalPrefix(new Date(), '鱼'))
+    expect(value.glyphs.map((glyph) => glyph.char).join('')).toBe(`${hanOnly(value.prefix)}其雨吉`)
   })
 
   it('keeps a 空刻 slot for a character outside the corpus', async () => {
@@ -229,6 +294,8 @@ describe('zhenren_inscribe', () => {
     expect(placeholder?.placeholder).toBe(true)
     expect(placeholder?.glyphChar).toBeNull()
     expect(placeholder?.reason).toBe('not-in-oracle-corpus')
+    // The model should be told to rewrite next time, not to treat 空刻 as normal.
+    expect(value.warnings.some((warning) => warning.includes('空刻'))).toBe(true)
   })
 
   it('rejects input that cannot be laid out', async () => {

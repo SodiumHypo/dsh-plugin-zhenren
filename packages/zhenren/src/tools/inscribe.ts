@@ -14,6 +14,7 @@ import type { OracleIndex } from '../data/load.js'
 import { splitHanCharacters } from '../data/lookup.js'
 import { planCarve } from '../ritual/carve.js'
 import { DEFAULT_BOUNDS, generateCracks } from '../ritual/crack.js'
+import { canonicalPrefix } from '../ritual/ganzhi.js'
 import { planGlyphs } from '../ritual/glyph-plan.js'
 import { computeLayout, describeLayout, MAX_SLOTS } from '../ritual/layout.js'
 import type { RitualLayout } from '../ritual/layout.js'
@@ -71,6 +72,7 @@ const INSCRIBE_OUTPUT = {
   properties: {
     ok: { type: 'boolean', required: true },
     divinationId: { oneOf: [{ type: 'string' }, { type: 'null' }], required: true },
+    prefix: { type: 'string', required: true },
     missing: { type: 'array', items: { type: 'string' }, required: true },
     glyphs: {
       type: 'array',
@@ -127,8 +129,11 @@ export interface InscribeDeps {
 
 const DESCRIPTION =
   '刻辞。把前辞、命辞、占辞刻到同一块龟甲上。'
+  + '前辞由系统按当日干支固定为「<干支>卜，<贞人名>贞：」，你只需提供命辞与占辞，不要在 charge 里重复前辞。'
   + '占辞必须依据 zhenren_burn 返回的 auspice，不得改写。'
   + '字库外的字会保留槽位成为空刻（placeholder），此时 ok 仍为 true；'
+  + '空刻越少越好：先换字或省略，用库内字的单字表达；确实无法改写时才接受空刻。'
+  + '用 layout.direction 决定卜辞走向：rtl 从右上往左下，ltr 从左上往右下；自行判断。'
   + '只有卜辞为空、超过字数上限或布局不成立时才返回 ok: false。'
   + `highlight 最多 ${MAX_HIGHLIGHTS} 个字，工具会为这些字返回完整《说文》释义。`
 
@@ -136,6 +141,7 @@ function failure(message: string): InscribeValue {
   return {
     ok: false,
     divinationId: null,
+    prefix: '',
     missing: [],
     glyphs: [],
     layoutSummary: '',
@@ -185,9 +191,9 @@ export function createInscribeTool(deps: InscribeDeps) {
         properties: {
           prefix: {
             type: 'string',
-            description: '前辞（日期、贞人名等）。可省略。',
+            description: '已废弃：前辞由系统固定生成，此值会被忽略。不要填写。',
           },
-          charge: { type: 'string', required: true, description: '命辞：所问之事。' },
+          charge: { type: 'string', required: true, description: '命辞：所问之事；不要包含日期或贞人名。' },
           prognosis: { type: 'string', required: true, description: '占辞：依据 auspice 作出的判断。' },
         },
       },
@@ -202,6 +208,11 @@ export function createInscribeTool(deps: InscribeDeps) {
         description: '布局建议。columns 会被收敛到 1-4 列。',
         properties: {
           columns: { type: 'integer', description: '建议列数，1-4。' },
+          direction: {
+            type: 'string',
+            enum: ['rtl', 'ltr'],
+            description: '卜辞走向：rtl 从右上往左下（列自右向左），ltr 从左上往右下（列自左向右）。',
+          },
         },
       },
     },
@@ -210,6 +221,7 @@ export function createInscribeTool(deps: InscribeDeps) {
       render(_args, value): ContentBlock[] {
         if (!value.ok) return [{ type: 'text', text: `刻辞未成：${value.error ?? '未知原因'}` }]
         const lines = [`卜辞已刻（${value.layoutSummary}）。`]
+        lines.push(`前辞：${value.prefix}`)
         lines.push(value.glyphs.map((glyph) => glyph.char).join(''))
         if (value.missing.length > 0) {
           lines.push(`未收字：${value.missing.join('、')}（已刻为空刻）。`)
@@ -242,6 +254,7 @@ export function createInscribeTool(deps: InscribeDeps) {
             requestedColumns: args.layout?.columns,
             bounds: DEFAULT_BOUNDS,
             burnPoint: continuity?.burnPoint,
+            direction: args.layout?.direction,
           }) ?? EMPTY_LAYOUT
         const carve = planCarve(
           args.burnSeed,
@@ -278,7 +291,7 @@ export function createInscribeTool(deps: InscribeDeps) {
                   burnPoint: continuity.burnPoint,
                 }),
           glyphs,
-          layout: { columns: layout.columns, direction: 'rtl', slots: layout.slots },
+          layout: { columns: layout.columns, direction: layout.direction, slots: layout.slots },
           carve,
           highlightGlosses,
           animation: config.animation,
@@ -298,7 +311,10 @@ export function createInscribeTool(deps: InscribeDeps) {
       }
 
       const inscription = args.inscription
-      const text = [inscription.prefix ?? '', inscription.charge, inscription.prognosis].join('')
+      // The opening is a calendar fact, not a model choice. A model-supplied
+      // prefix is ignored so the 前辞 cannot drift in style or date.
+      const prefix = canonicalPrefix(new Date(), config.divinerName)
+      const text = [prefix, inscription.charge, inscription.prognosis].join('')
       const charCount = splitHanCharacters(text).length
       if (charCount === 0) {
         return failure('卜辞为空：前辞、命辞、占辞至少要有一个汉字')
@@ -325,12 +341,17 @@ export function createInscribeTool(deps: InscribeDeps) {
         requestedColumns: args.layout?.columns,
         bounds: DEFAULT_BOUNDS,
         burnPoint: continuity?.burnPoint,
+        direction: args.layout?.direction,
       })
       if (layout === null) {
         return failure(`布局无法成立：最多 ${MAX_SLOTS} 个刻位；请缩短卜辞`)
       }
 
       const plan = planGlyphs(getIndex(), text)
+      if (plan.missing.length > 0) {
+        // Surface the preference at the protocol boundary, not only on the card.
+        warnings.push(`卜辞含库外字（${plan.missing.join('、')}），已刻为空刻；应先换字或省略`)
+      }
       const highlights = normalizeHighlights(args.highlight, text)
 
       const glyphs: InscribeValue['glyphs'] = plan.entries.map((entry) => {
@@ -364,6 +385,7 @@ export function createInscribeTool(deps: InscribeDeps) {
       return {
         ok: true,
         divinationId: args.divinationId,
+        prefix,
         missing: plan.missing,
         glyphs,
         layoutSummary: describeLayout(layout),

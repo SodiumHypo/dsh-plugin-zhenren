@@ -24,6 +24,8 @@ export interface Config {
   showShuowen?: boolean
   /** UI locale; classical text is never translated. @default 'zh-CN' */
   locale?: string
+  /** Name used in the fixed 前辞 opening `<干支>卜，<name>贞：`. @default '鱼' */
+  divinerName?: string
 }
 
 /** Schemastery schema, the shape dsh loads from the profile. */
@@ -34,6 +36,7 @@ export const Config: Schema<Config> = Schema.object({
   auspiceBalance: Schema.union(['balanced', 'gentle', 'stern']).default('balanced'),
   showShuowen: Schema.boolean().default(true),
   locale: Schema.string().default('zh-CN'),
+  divinerName: Schema.string().default('鱼'),
 })
 
 /** Config with every default applied. */
@@ -44,11 +47,13 @@ export interface ResolvedConfig {
   readonly auspiceBalance: AuspiceBalance
   readonly showShuowen: boolean
   readonly locale: string
+  readonly divinerName: string
 }
 
 /** Apply defaults and clamp the one numeric bound that layout also enforces. */
 export function resolveConfig(config: Config = {}): ResolvedConfig {
   const maxInscriptionChars = config.maxInscriptionChars ?? 48
+  const divinerName = (config.divinerName ?? '鱼').trim().slice(0, 4)
   return {
     enabled: config.enabled ?? true,
     animation: config.animation ?? 'full',
@@ -56,5 +61,6 @@ export function resolveConfig(config: Config = {}): ResolvedConfig {
     auspiceBalance: config.auspiceBalance ?? 'balanced',
     showShuowen: config.showShuowen ?? true,
     locale: config.locale ?? 'zh-CN',
+    divinerName: divinerName === '' ? '鱼' : divinerName,
   }
 }

@@ -1,8 +1,10 @@
 /**
  * Inscription layout (CLAUDE.md §5.5).
  *
- * Vertical columns, right to left, top to bottom within a column. Coordinates
- * are normalized to the shell; the client scales them to its canvas.
+ * Vertical columns, top to bottom within a column. The diviner chooses the
+ * column progression: `rtl` starts at the upper right and advances left,
+ * `ltr` starts at the upper left and advances right. Coordinates are
+ * normalized to the shell; the client scales them to its canvas.
  *
  * Missing characters keep their slot. A 空刻 is a real position, not a gap in
  * the layout: the reader sees that something is absent.
@@ -13,6 +15,9 @@ export const MAX_COLUMNS = 4
 export const MAX_ROWS = 12
 /** Hard upper bound on carvable slots; mirrors `maxInscriptionChars`. */
 export const MAX_SLOTS = MAX_COLUMNS * MAX_ROWS
+
+/** Column progression across the shell. */
+export type LayoutDirection = 'ltr' | 'rtl'
 
 export interface LayoutSlot {
   index: number
@@ -27,7 +32,7 @@ export interface LayoutSlot {
 export interface RitualLayout {
   columns: number
   rows: number
-  direction: 'rtl'
+  direction: LayoutDirection
   slots: LayoutSlot[]
 }
 
@@ -39,6 +44,8 @@ export interface LayoutInput {
   bounds: Rect
   /** Used to shift the text block away from the heated spot. */
   burnPoint?: { x: number; y: number } | undefined
+  /** Column progression chosen by the diviner. @default 'rtl' */
+  direction?: LayoutDirection | undefined
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -64,6 +71,7 @@ export function computeLayout(input: LayoutInput): RitualLayout | null {
   const rows = Math.ceil(count / columns)
   if (rows > MAX_ROWS) return null
 
+  const direction: LayoutDirection = input.direction ?? 'rtl'
   const areaW = bounds.w * 0.8
   const areaH = bounds.h * 0.8
   // Keep the block off the burn point's half of the shell when possible.
@@ -82,16 +90,20 @@ export function computeLayout(input: LayoutInput): RitualLayout | null {
       index,
       column,
       row,
-      x: round(areaX + areaW - (column + 0.5) * cellW, 4),
+      x:
+        direction === 'rtl'
+          ? round(areaX + areaW - (column + 0.5) * cellW, 4)
+          : round(areaX + (column + 0.5) * cellW, 4),
       y: round(areaY + (row + 0.5) * cellH, 4),
       size: round(size, 4),
     })
   }
 
-  return { columns, rows, direction: 'rtl', slots }
+  return { columns, rows, direction, slots }
 }
 
 /** Human-readable summary returned to the model. */
 export function describeLayout(layout: RitualLayout): string {
-  return `${layout.columns} columns, right-to-left`
+  const order = layout.direction === 'rtl' ? 'right-to-left' : 'left-to-right'
+  return `${layout.columns} columns, ${order}`
 }

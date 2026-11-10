@@ -46,10 +46,11 @@ function insideBreak(fraction: number, breaks: readonly CrackBreak[]): boolean {
 function strokePath(
   ctx: CanvasRenderingContext2D,
   points: readonly Vec2[],
-  width: number,
+  crackWidth: number,
   breaks: readonly CrackBreak[],
   reveal: number,
-  widthScale: number,
+  width: number,
+  height: number,
 ): void {
   if (reveal <= 0 || points.length < 2) return
   const lengths = cumulative(points)
@@ -57,7 +58,7 @@ function strokePath(
   if (total <= 0) return
 
   const limit = total * clamp(reveal, 0, 1)
-  const stroke = Math.max(0.7, width * widthScale)
+  const stroke = Math.max(0.7, crackWidth * (width / WIDTH_REFERENCE))
   const steps = Math.max(48, points.length * 6)
 
   ctx.save()
@@ -80,8 +81,9 @@ function strokePath(
         break
       }
       const local = step / substeps
-      const x = from[0] + (to[0] - from[0]) * local
-      const y = from[1] + (to[1] - from[1]) * local
+      // Spec points are normalized to the shell; canvas coordinates are pixels.
+      const x = (from[0] + (to[0] - from[0]) * local) * width
+      const y = (from[1] + (to[1] - from[1]) * local) * height
       if (insideBreak(travelled / total, breaks)) {
         penDown = false
         continue
@@ -214,13 +216,12 @@ export function drawOmen(
   drawScorch(ctx, width, height, spec, phase.heat)
   drawHeat(ctx, width, height, spec, phase.heat, seed)
 
-  const widthScale = width / WIDTH_REFERENCE
   const mainReveal = clamp(phase.crack / 0.6, 0, 1)
-  strokePath(ctx, spec.main.points, spec.main.width, spec.main.breaks, mainReveal, widthScale)
+  strokePath(ctx, spec.main.points, spec.main.width, spec.main.breaks, mainReveal, width, height)
 
   for (const branch of spec.branches) {
     const reveal = branch.order === 2 ? branchReveal(phase.crack * 0.85, branch) : branchReveal(phase.crack, branch)
-    strokePath(ctx, branch.points, branch.width, branch.breaks, reveal, widthScale)
+    strokePath(ctx, branch.points, branch.width, branch.breaks, reveal, width, height)
   }
 }
 
