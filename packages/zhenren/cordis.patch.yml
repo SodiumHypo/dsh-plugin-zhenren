@@ -1,0 +1,5 @@
+# Bundle layer for 甲骨贞人. A profile that lists this package as a bundle
+# inserts the plugin row; profiles may override the row by id afterwards.
+- insert:
+    - id: zhenren
+      name: dsh-plugin-zhenren

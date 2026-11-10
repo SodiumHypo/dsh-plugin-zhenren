@@ -1,0 +1,123 @@
+/**
+ * Carved-glyph rendering (CLAUDE.md §5.5).
+ *
+ * A glyph is revealed by an irregular staircase clip, top to bottom — the
+ * order is visual only and does not claim to be stroke order. A missing
+ * character renders as a shallow 空刻 pit, never as a synthesised glyph.
+ */
+import { createRng } from '../../shared/rng.js'
+
+const CARVE_INK = 'rgba(38, 28, 20, 0.92)'
+const CARVE_EDGE = 'rgba(250, 242, 226, 0.35)'
+const PLACEHOLDER_INK = 'rgba(96, 78, 56, 0.28)'
+
+export interface CarvedGlyphInput {
+  /** Codepoint string drawn from the oracle font. */
+  char: string
+  /** Centre in device pixels. */
+  x: number
+  y: number
+  /** Glyph box in device pixels. */
+  size: number
+  /** Reveal, 0..1. */
+  progress: number
+  /** 0.55..1; deeper pressure is darker and wider. */
+  pressure: number
+  maskSeed: number
+  fontFamily: string
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value))
+}
+
+/** Build a jagged top-to-bottom reveal polygon. */
+function revealClip(
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  size: number,
+  progress: number,
+  maskSeed: number,
+): void {
+  const rng = createRng(`carve-mask:${maskSeed}`)
+  const columns = 9
+  const band = size / columns
+  const revealHeight = size * clamp(progress, 0, 1)
+  ctx.beginPath()
+  ctx.moveTo(left - band * 0.2, top - band * 0.4)
+  ctx.lineTo(left + size + band * 0.2, top - band * 0.4)
+  // Right edge down to the reveal frontier.
+  ctx.lineTo(left + size + band * 0.2, top + revealHeight)
+  // Frontier marches right-to-left with a per-column notch.
+  for (let index = columns; index >= 0; index--) {
+    const notch = rng.range(0.45, 1.35)
+    const y = Math.min(top + size, top + revealHeight * notch)
+    ctx.lineTo(left + index * band, y)
+  }
+  ctx.lineTo(left - band * 0.2, top - band * 0.4)
+  ctx.closePath()
+}
+
+/** A real glyph, revealed by the chisel mask. */
+export function drawCarvedGlyph(ctx: CanvasRenderingContext2D, input: CarvedGlyphInput): void {
+  if (input.progress <= 0 || input.char === '') return
+  const size = input.size
+  const left = input.x - size / 2
+  const top = input.y - size / 2
+
+  ctx.save()
+  revealClip(ctx, left, top, size, input.progress, input.maskSeed)
+  ctx.clip()
+  ctx.font = `${size}px "${input.fontFamily}"`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+
+  // Chisel highlight: a faint light edge under the incision.
+  ctx.fillStyle = CARVE_EDGE
+  ctx.fillText(input.char, input.x + size * 0.012, input.y + size * 0.012)
+
+  const strength = clamp(0.55 + input.pressure * 0.45, 0.55, 1)
+  ctx.fillStyle = CARVE_INK
+  ctx.globalAlpha = strength
+  ctx.fillText(input.char, input.x, input.y)
+  ctx.globalAlpha = 1
+  ctx.restore()
+}
+
+/**
+ * 空刻: a shallow pit with a few tool marks.
+ * Not a glyph, not a blank — the slot visibly holds an absence.
+ */
+export function drawPlaceholder(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  progress: number,
+  maskSeed: number,
+): void {
+  if (progress <= 0) return
+  const rng = createRng(`placeholder:${maskSeed}`)
+  const reveal = clamp(progress, 0, 1)
+  const width = size * 0.5
+  const height = size * 0.42
+
+  ctx.save()
+  ctx.strokeStyle = PLACEHOLDER_INK
+  ctx.lineWidth = Math.max(0.8, size * 0.022)
+  ctx.lineCap = 'round'
+  const marks = 5
+  for (let index = 0; index < marks; index++) {
+    const row = index / marks
+    if (row > reveal) break
+    const fromX = x - width / 2 + rng.range(0, width * 0.2)
+    const toX = x + width / 2 - rng.range(0, width * 0.2)
+    const lineY = y - height / 2 + height * row + rng.range(-1, 1) * size * 0.02
+    ctx.beginPath()
+    ctx.moveTo(fromX, lineY)
+    ctx.lineTo(toX, lineY + rng.range(-1, 1) * size * 0.03)
+    ctx.stroke()
+  }
+  ctx.restore()
+}

@@ -1,0 +1,10 @@
+node_modules/
+lib/
+coverage/
+*.tsbuildinfo
+*.log
+.DS_Store
+Thumbs.db
+
+# Reference snapshots are build inputs, not repository content (237 MB).
+.refs/

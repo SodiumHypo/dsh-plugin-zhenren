@@ -1,0 +1,16 @@
+{
+  "name": "dsh-plugins",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Out-of-tree plugins for DeepSeek Harness",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "extract": "node packages/zhenren/scripts/extract-yigezi/index.mjs",
+    "build": "npm run build --workspace=dsh-plugin-zhenren",
+    "test": "npm run test --workspace=dsh-plugin-zhenren",
+    "typecheck": "npm run typecheck --workspace=dsh-plugin-zhenren"
+  }
+}
