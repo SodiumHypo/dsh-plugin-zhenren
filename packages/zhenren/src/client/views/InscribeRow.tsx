@@ -8,12 +8,14 @@
 import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
 import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
-import { parseInscribeMeta, type InscribePresentationMeta } from '../../contract.js'
+import { parseInscribeMeta, type InscribePresentationMeta, type MetaGlyph } from '../../contract.js'
 import { drawCarvedGlyph, drawGlyphGhost, drawPlaceholder } from '../render/carve.js'
 import { drawOmen } from '../render/cracks.js'
 import { drawShell } from '../render/shell.js'
 import { carveFrame, carveTotalMs } from '../render/timeline.js'
+import type { GlyphSource } from '../render/glyph-source.js'
 import { ORACLE_FONT_FAMILY, loadOracleFont } from '../font.js'
+import { loadGlyphImages } from '../glyph-images.js'
 import { RitualCanvas, type CanvasDraw } from './RitualCanvas.js'
 import { resultFailed, resultText } from './result.js'
 import * as styles from './styles.js'
@@ -25,6 +27,14 @@ type FontState = 'pending' | 'ok' | 'missing'
 
 /** Marker for a slot the corpus cannot fill; the pit on the shell says the same. */
 const PLACEHOLDER = '□'
+
+/** Pick the rendering branch for a found slot (D17); null when it has no glyph. */
+function sourceOf(glyph: MetaGlyph): GlyphSource | null {
+  if (glyph.glyphChar === null) return null
+  return glyph.glyphSource === 'image'
+    ? { kind: 'image', char: glyph.glyphChar }
+    : { kind: 'font', char: glyph.glyphChar, fontFamily: ORACLE_FONT_FAMILY }
+}
 
 function MessageCard(props: {
   t: InscribeRowProps['t']
@@ -73,6 +83,7 @@ function InscribeCard(props: { meta: InscribePresentationMeta; t: InscribeRowPro
   const [replayKey, setReplayKey] = useState(0)
   const [instant, setInstant] = useState(false)
   const [fontState, setFontState] = useState<FontState>('pending')
+  const [imagesReady, setImagesReady] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -88,6 +99,32 @@ function InscribeCard(props: { meta: InscribePresentationMeta; t: InscribeRowPro
       alive = false
     }
   }, [])
+
+  // Only the image glyphs this card actually carves need decoding (D17).
+  const imageChars = useMemo(
+    () =>
+      meta.glyphs.flatMap((glyph) =>
+        glyph.found && glyph.glyphSource === 'image' && glyph.glyphChar !== null
+          ? [glyph.glyphChar]
+          : [],
+      ),
+    [meta.glyphs],
+  )
+
+  useEffect(() => {
+    let alive = true
+    loadGlyphImages(imageChars).then(
+      () => {
+        if (alive) setImagesReady(true)
+      },
+      () => {
+        if (alive) setImagesReady(true)
+      },
+    )
+    return () => {
+      alive = false
+    }
+  }, [imageChars])
 
   const steps = useMemo(
     () => new Map(meta.carve.chars.map((step) => [step.slot, step] as const)),
@@ -105,22 +142,22 @@ function InscribeCard(props: { meta: InscribePresentationMeta; t: InscribeRowPro
         // The omen is complete by the time the inscription is carved.
         drawOmen(ctx, meta.cracks, width, height, { heat: 0.12, crack: 1 }, meta.burnSeed)
       }
-      if (fontState !== 'ok') return
+      if (fontState !== 'ok' || !imagesReady) return
 
       const progress = carveFrame(meta.carve.chars, elapsedMs)
       const unit = Math.min(width, height)
       // The whole inscription is faintly legible before the first stroke; the
       // chisel then darkens each slot in turn.
       for (const glyph of meta.glyphs) {
-        if (!glyph.found || glyph.glyphChar === null) continue
+        if (!glyph.found) continue
+        const source = sourceOf(glyph)
         const slot = slots.get(glyph.slot)
-        if (slot === undefined) continue
+        if (source === null || slot === undefined) continue
         drawGlyphGhost(ctx, {
-          char: glyph.glyphChar,
+          source,
           x: slot.x * width,
           y: slot.y * height,
           size: slot.size * unit,
-          fontFamily: ORACLE_FONT_FAMILY,
         })
       }
       for (const glyph of meta.glyphs) {
@@ -135,19 +172,20 @@ function InscribeCard(props: { meta: InscribePresentationMeta; t: InscribeRowPro
           drawPlaceholder(ctx, x, y, size, revealed, step?.maskSeed ?? glyph.slot)
           continue
         }
+        const source = sourceOf(glyph)
+        if (source === null) continue
         drawCarvedGlyph(ctx, {
-          char: glyph.glyphChar,
+          source,
           x,
           y,
           size,
           progress: revealed,
           pressure: step?.pressure ?? 0.8,
           maskSeed: step?.maskSeed ?? glyph.slot,
-          fontFamily: ORACLE_FONT_FAMILY,
         })
       }
     },
-    [meta, fontState, slots, steps],
+    [meta, fontState, imagesReady, slots, steps],
   )
 
   const durationMs = Math.max(500, carveTotalMs(meta.carve.chars))
@@ -171,7 +209,7 @@ function InscribeCard(props: { meta: InscribePresentationMeta; t: InscribeRowPro
           <RitualCanvas
             draw={draw}
             durationMs={durationMs}
-            animate={animatable && !instant && fontState === 'ok'}
+            animate={animatable && !instant && fontState === 'ok' && imagesReady}
             replayKey={replayKey}
             label={`${t('inscribe.title')}：${transcription}`}
           />
@@ -212,6 +250,7 @@ function InscribeCard(props: { meta: InscribePresentationMeta; t: InscribeRowPro
         <span style={styles.attributionStyle}>
           <div>{meta.attribution}</div>
           <div>{t('card.boundary')}</div>
+          {meta.supportedCount > 0 ? <div>{t('card.corpus', { n: meta.supportedCount })}</div> : null}
         </span>
         {animatable ? (
           <>

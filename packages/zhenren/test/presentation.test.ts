@@ -46,6 +46,43 @@ describe('card footer', () => {
     const legacy = { ...raw, attribution: `${ATTRIBUTION}${dictionaries.zh['card.boundary']}` }
     expect(parseBurnMeta(legacy)?.attribution).toBe(ATTRIBUTION)
   })
+
+  it('carries the corpus size into meta for the dynamic footer line (D19)', async () => {
+    const memory = createDivinationMemory()
+    const burn = createBurnTool({ getIndex: () => index, config: CONFIG, memory })
+    const burnArgs = { question: 'q', charge: '贞', seed: 'meta-corpus' }
+    const burnValue = (await burn.execute(burnArgs, EXEC)) as unknown as BurnValue
+    const burnRaw = burn.output.presentationMeta?.(burnArgs, burnValue as never) as Record<string, unknown>
+    expect(burnRaw.supportedCount).toBe(index.supportedCount)
+    expect(parseBurnMeta(burnRaw)?.supportedCount).toBe(index.supportedCount)
+
+    const inscribe = createInscribeTool({ getIndex: () => index, config: CONFIG, memory })
+    const inscribeArgs = {
+      divinationId: burnValue.divinationId,
+      burnSeed: burnValue.seed,
+      inscription: { charge: '今其出', prognosis: '吉' },
+    }
+    const inscribeValue = (await inscribe.execute(inscribeArgs, EXEC)) as unknown as InscribeValue
+    const inscribeRaw = inscribe.output.presentationMeta?.(inscribeArgs, inscribeValue as never) as Record<string, unknown>
+    expect(inscribeRaw.supportedCount).toBe(index.supportedCount)
+    expect(parseInscribeMeta(inscribeRaw)?.supportedCount).toBe(index.supportedCount)
+
+    // The locale template interpolates the count exactly once.
+    expect(dictionaries.zh['card.corpus'].replace('{n}', String(index.supportedCount)))
+      .toBe(`字形库 ${index.supportedCount} 字；未收字以空刻表示。`)
+
+    // Old metas without the field degrade to 0; the footer omits the count line.
+    expect(parseBurnMeta({ ...burnRaw, supportedCount: undefined })?.supportedCount).toBe(0)
+    expect(parseInscribeMeta({ ...inscribeRaw, supportedCount: undefined })?.supportedCount).toBe(0)
+
+    // A failed inscribe carries 0 (its card is a text fallback, no footer).
+    const failed = (await inscribe.execute(
+      { divinationId: 'bad', burnSeed: 'meta-corpus', inscription: { charge: '吉', prognosis: '吉' } },
+      EXEC,
+    )) as unknown as { ok: boolean; supportedCount: number }
+    expect(failed.ok).toBe(false)
+    expect(failed.supportedCount).toBe(0)
+  })
 })
 
 interface BurnValue {
@@ -99,7 +136,8 @@ describe('burn presentationMeta', () => {
     const value = (await tool.execute(args, EXEC)) as unknown as BurnValue
     const raw = tool.output.presentationMeta?.(args, value as never) as Record<string, unknown>
     expect(parseBurnMeta(null)).toBeNull()
-    expect(parseBurnMeta({ ...raw, version: 2 })).toBeNull()
+    // v2 is now a supported version (D17); only newer metas fall back.
+    expect(parseBurnMeta({ ...raw, version: 3 })).toBeNull()
     expect(parseBurnMeta({ ...raw, cracks: null })).toBeNull()
     expect(parseBurnMeta({ ...raw, burnPoint: { x: 1.5, y: 0.5 } })).toBeNull()
     expect(parseCrackSpec({ ...(raw.cracks as object), version: 2 })).toBeNull()
@@ -188,9 +226,41 @@ describe('inscribe presentationMeta', () => {
       found: false,
       glyphChar: null,
       placeholder: true,
+      glyphSource: 'font',
     })
     expect(meta.auspice).toBeNull()
     expect(meta.cracks).toBeNull()
+  })
+
+  it('carries glyphSource for image glyphs and rejects a corrupt branch (D17)', async () => {
+    const args = {
+      divinationId: 'div_abcdef',
+      burnSeed: 'meta-image',
+      inscription: { charge: '福', prognosis: '吉' },
+    }
+    const tool = createInscribeTool({ getIndex: () => index, config: CONFIG, memory: createDivinationMemory() })
+    const value = (await tool.execute(args, EXEC)) as unknown as InscribeValue
+    const raw = tool.output.presentationMeta?.(args, value as never) as Record<string, unknown>
+    const meta = parseInscribeMeta(raw)
+    expect(meta).not.toBeNull()
+    if (meta === null) return
+    expect(meta.version).toBe(2)
+    const fu = meta.glyphs.find((glyph) => glyph.char === '福')
+    expect(fu?.found).toBe(true)
+    expect(fu?.glyphSource).toBe('image')
+    const ji = meta.glyphs.find((glyph) => glyph.char === '吉')
+    expect(ji?.glyphSource).toBe('font')
+
+    // A v2 found-glyph must declare a valid branch; missing/unknown → text fallback.
+    const glyphs = raw.glyphs as Array<Record<string, unknown>>
+    const stripped = glyphs.map((glyph) =>
+      glyph.char === '福' ? { ...glyph, glyphSource: undefined } : glyph,
+    )
+    expect(parseInscribeMeta({ ...raw, glyphs: stripped })).toBeNull()
+    const bogus = glyphs.map((glyph) =>
+      glyph.char === '福' ? { ...glyph, glyphSource: 'svg' } : glyph,
+    )
+    expect(parseInscribeMeta({ ...raw, glyphs: bogus })).toBeNull()
   })
 
   it('degrades malformed metas instead of throwing', () => {
@@ -210,6 +280,8 @@ describe('inscribe presentationMeta', () => {
     }
     const parsed = parseInscribeMeta(minimal)
     expect(parsed?.glyphs[0]?.placeholder).toBe(true)
+    // v1 metas carry no glyphSource; the parser defaults it to font (D17).
+    expect(parsed?.glyphs[0]?.glyphSource).toBe('font')
     expect(parsed?.animation).toBe('full')
     expect(parsed?.showShuowen).toBe(true)
 

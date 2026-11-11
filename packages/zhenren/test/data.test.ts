@@ -14,14 +14,22 @@ const dataDir = fileURLToPath(new URL('../data', import.meta.url))
 const index = loadOracleIndex({ dataDir })
 
 describe('shipped corpus', () => {
-  it('ships 1,425 glyphs, 1,181 headwords and 627 aliases', () => {
-    expect(index.glyphs.size).toBe(1425)
-    expect(index.headwords.size).toBe(1181)
-    expect(index.aliases.size).toBe(627)
-    expect(index.supportedCount).toBe(1425)
-    expect(index.counts.glyphs).toBe(1425)
-    expect(index.counts.glossedGlyphs).toBe(1202)
-    expect(index.counts.glyphOnly).toBe(223)
+  it('ships the font + image corpus with consistent counts (D17)', () => {
+    expect(index.glyphs.size).toBe(1628)
+    expect(index.headwords.size).toBe(1384)
+    expect(index.aliases.size).toBe(762)
+    expect(index.supportedCount).toBe(1628)
+    expect(index.counts.glyphs).toBe(1628)
+    expect(index.counts.fontGlyphs).toBe(1425)
+    expect(index.counts.imageGlyphs).toBe(203)
+    expect(index.counts.glossedGlyphs).toBe(1441)
+    expect(index.counts.glyphOnly).toBe(187)
+    // The font layer is unchanged by the expansion; images only add glyphs.
+    const fontGlyphs = [...index.glyphs.values()].filter((record) => record.source === 'font')
+    const imageGlyphs = [...index.glyphs.values()].filter((record) => record.source === 'image')
+    expect(fontGlyphs.length).toBe(1425)
+    expect(imageGlyphs.length).toBe(203)
+    expect(index.counts.fontGlyphs + index.counts.imageGlyphs).toBe(index.counts.glyphs)
   })
 
   it('never leaves a glyph pointing at a missing headword', () => {
@@ -41,10 +49,11 @@ describe('shipped corpus', () => {
 
   it('shares 说文 headwords without duplicating the gloss', () => {
     const shared = [...index.headwords.values()].filter((record) => record.glyphChars.length > 1)
-    expect(shared.length).toBe(21)
+    expect(shared.length).toBe(54)
     const ming = index.headwords.get('朙')
-    expect(ming?.glyphChars.length).toBe(2)
-    expect(ming?.glyphChars).toEqual(expect.arrayContaining(['明', '朙']))
+    // 眀→朙 is a sourced adjudication, so 朙 now gathers three glyph forms.
+    expect(ming?.glyphChars.length).toBe(3)
+    expect(ming?.glyphChars).toEqual(expect.arrayContaining(['明', '朙', '眀']))
   })
 
   it('excludes phonology fields and keeps 说文 originals non-empty', () => {
@@ -62,6 +71,23 @@ describe('shipped corpus', () => {
       }
     }
     expect(violations).toEqual([])
+  })
+
+  it('carries a draft vernacular paraphrase for every headword (D18)', () => {
+    const violations: string[] = []
+    for (const [headword, record] of index.headwords) {
+      if (record.shuowen.vernacular.length === 0) {
+        violations.push(`${headword}: empty vernacular`)
+      }
+      if (record.shuowen.vernacularStatus !== 'draft') {
+        violations.push(`${headword}: vernacular not labelled draft`)
+      }
+    }
+    expect(violations).toEqual([])
+    // The paraphrase is our modern 转述, distinct from the verbatim original.
+    const fu = index.headwords.get('福')
+    expect(fu?.shuowen.vernacular).toBe('祐；福。')
+    expect(fu?.shuowen.original).not.toBe(fu?.shuowen.vernacular)
   })
 })
 
@@ -102,8 +128,39 @@ describe('query contract', () => {
     expect(miss.found).toBe(false)
     if (miss.found) return
     expect(miss.reason).toBe('not-in-oracle-corpus')
-    expect(miss.supportedCount).toBe(1425)
+    expect(miss.supportedCount).toBe(1628)
     expect(miss.normalized).toBe('龘')
+  })
+
+  it('returns an image glyph with its source and provenance (D17)', () => {
+    const fu = lookupOracle(index, '福')
+    expect(fu.found).toBe(true)
+    if (!fu.found) return
+    expect(fu.glyphChar).toBe('福')
+    expect(fu.glyphSource).toBe('image')
+    expect(fu.headword).toBe('福')
+    expect(fu.shuowen).not.toBeNull()
+    expect(fu.matchedBy).toBe('glyph')
+    expect(fu.sources[0]?.value).toContain('HUST-OBC')
+    // The font layer still reports its own origin.
+    const ming = lookupOracle(index, '明')
+    expect(ming.found && ming.glyphSource).toBe('font')
+  })
+
+  it('applies sourced headword adjudications without guessing (M3)', () => {
+    // 雪→䨮 is a verified 隶变 relationship anchored to a 《说文》 headword.
+    const xue = lookupOracle(index, '雪')
+    expect(xue.found).toBe(true)
+    if (!xue.found) return
+    expect(xue.headword).toBe('䨮')
+    expect(xue.shuowen).not.toBeNull()
+    // 其 has a glyph but no defensible headword; it must stay glyph-only,
+    // never auto-mapped to 箕 by semantic similarity (CLAUDE.md §3.4).
+    const qi = lookupOracle(index, '其')
+    expect(qi.found).toBe(true)
+    if (!qi.found) return
+    expect(qi.headword).toBeNull()
+    expect(qi.shuowen).toBeNull()
   })
 
   it('rejects a query with no Han character', () => {

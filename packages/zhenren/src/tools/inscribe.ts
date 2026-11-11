@@ -1,10 +1,10 @@
 /**
  * `zhenren_inscribe` — 刻辞 (CLAUDE.md §4.5).
  *
- * Every Han character keeps a slot. Characters outside the 1,425-glyph corpus
- * are reported in `missing` and become 空刻 placeholders: the inscription is
- * still carved, and `ok` stays true. `ok: false` is reserved for input that
- * cannot be laid out at all.
+ * Every Han character keeps a slot. Characters outside the glyph corpus are
+ * reported in `missing` and become 空刻 placeholders: the inscription is still
+ * carved, and `ok` stays true. `ok: false` is reserved for input that cannot be
+ * laid out at all.
  */
 import { defineTool, type InferValue } from '@deepseek-ai/dsh-tools'
 import type { ContentBlock } from '@deepseek-ai/dsh-llm'
@@ -87,6 +87,7 @@ const INSCRIBE_OUTPUT = {
           glossFound: { type: 'boolean', required: true },
           headword: { oneOf: [{ type: 'string' }, { type: 'null' }] },
           glyphChar: { oneOf: [{ type: 'string' }, { type: 'null' }] },
+          glyphSource: { type: 'string', enum: ['font', 'image'] },
           shuowen: { oneOf: [glossSchema, { type: 'null' }] },
           placeholder: { type: 'boolean' },
           reason: { type: 'string' },
@@ -110,6 +111,7 @@ const INSCRIBE_OUTPUT = {
         { type: 'null' },
       ],
     },
+    supportedCount: { type: 'integer', required: true },
     attribution: { type: 'string', required: true },
   },
 } as const
@@ -148,6 +150,7 @@ function failure(message: string): InscribeValue {
     warnings: [],
     error: message,
     continuity: null,
+    supportedCount: 0,
     attribution: ATTRIBUTION,
   }
 }
@@ -238,6 +241,7 @@ export function createInscribeTool(deps: InscribeDeps) {
                 found: true,
                 glyphChar: glyph.glyphChar,
                 placeholder: false,
+                glyphSource: glyph.glyphSource === 'image' ? 'image' : 'font',
               }
             : {
                 slot: glyph.slot,
@@ -245,6 +249,7 @@ export function createInscribeTool(deps: InscribeDeps) {
                 found: false,
                 glyphChar: null,
                 placeholder: true,
+                glyphSource: 'font',
               },
         )
         const continuity = value.continuity
@@ -297,6 +302,7 @@ export function createInscribeTool(deps: InscribeDeps) {
           animation: config.animation,
           showShuowen: config.showShuowen,
           locale: config.locale,
+          supportedCount: value.supportedCount,
           attribution: ATTRIBUTION,
         }
         return meta
@@ -347,7 +353,8 @@ export function createInscribeTool(deps: InscribeDeps) {
         return failure(`布局无法成立：最多 ${MAX_SLOTS} 个刻位；请缩短卜辞`)
       }
 
-      const plan = planGlyphs(getIndex(), text)
+      const index = getIndex()
+      const plan = planGlyphs(index, text)
       if (plan.missing.length > 0) {
         // Surface the preference at the protocol boundary, not only on the card.
         warnings.push(`卜辞含库外字（${plan.missing.join('、')}），已刻为空刻；应先换字或省略`)
@@ -376,6 +383,7 @@ export function createInscribeTool(deps: InscribeDeps) {
           glossFound: lookup.shuowen !== null,
           headword: lookup.headword,
           glyphChar: lookup.glyphChar,
+          glyphSource: lookup.glyphSource,
           // Full glosses are context-expensive; only the model's picks get one.
           shuowen: highlights.has(entry.char) ? lookup.shuowen : null,
           placeholder: false,
@@ -392,6 +400,7 @@ export function createInscribeTool(deps: InscribeDeps) {
         warnings,
         error: null,
         continuity,
+        supportedCount: index.supportedCount,
         attribution: ATTRIBUTION,
       }
     },

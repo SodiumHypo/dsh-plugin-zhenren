@@ -9,8 +9,9 @@
 - `zhenren_burn`：生成唯一的 `auspice`（吉/凶/中性）、灼点与确定性兆纹；命辞逐字校验，库外字进入 `missing`。
 - `zhenren_inscribe`：把前辞、命辞、占辞刻到同一块甲面；前辞由 host 按本机当日干支固定为「戊子卜，鱼贞：」这类格式，缺字保留槽位成为「空刻」，`ok` 仍为 `true`；`layout.direction` 让贞人自己选择从左上往右下（ltr）还是从右上往左下（rtl）刻。
 - 系统提示词段：贞人人格、工具顺序、甲骨卜辞的极简记录体（实词单字、不用语气词）、优先换字或省略以避免空刻、不得改写兆象、不得伪造字形或《说文》引文。
-- 客户端卡片：Canvas 灼龟/兆纹与逐字刻辞、跳过/重放、`prefers-reduced-motion`、字体或 meta 失效时的纯文本兜底。
-- 数据：1,425 个甲骨字形、1,181 个《说文》字头、627 条别名；`found` 与 `shuowen` 分开表达。
+- 客户端卡片：Canvas 灼龟/兆纹与逐字刻辞、跳过/重放、`prefers-reduced-motion`、字体或 meta 失效时的纯文本兜底；图像字形与字体字形共用同一套刻痕渲染。
+- 数据：1,628 个甲骨字形（Oracular 字体 1,425 + HUST-OBC 精选图像 203）、1,384 个《说文》字头、762 条别名；`found` 与 `shuowen` 分开表达。
+- 释义：1,384 个字头均带一句现代白话转述（状态 `draft`），卡片以「现代转述」标注，与《说文》原文严格区分。
 
 ## 构建与测试
 
@@ -33,14 +34,14 @@ npm run extract
 从 npm 安装（发布后）：
 
 ```sh
-dsh plugin --profile demo add dsh-plugin-zhenren@1.0.0-alpha.1
+dsh plugin --profile demo add dsh-plugin-zhenren@1.1.0-beta.1
 ```
 
 从 tarball 安装：
 
 ```sh
 cd packages/zhenren && npm pack
-dsh plugin --profile demo add ./dsh-plugin-zhenren-1.0.0-alpha.1.tgz
+dsh plugin --profile demo add ./dsh-plugin-zhenren-1.1.0-beta.1.tgz
 ```
 
 从本地 checkout 安装（开发）：
@@ -90,8 +91,8 @@ profile 覆盖示例：
 
 ## 边界
 
-- **1,425 字是硬上限**：字形只来自 `orac.woff2`；库外字返回 `found: false`，卜辞中表现为空刻，绝不合成字形。
-- **`found` ≠ 有释义**：1,202 个字形能接上《说文》，223 个只有字形；后者返回 `headword: null`、`shuowen: null`。
+- **字形库是硬上限**：当前 1,628 字（字体 1,425 + HUST-OBC 图像 203），随数据版本动态取值；字形只来自随包字体与精选图像，库外字返回 `found: false`，卜辞中表现为空刻，绝不合成字形。
+- **`found` ≠ 有释义**：1,441 个字形能接上《说文》，187 个只有字形；后者返回 `headword: null`、`shuowen: null`。
 - **单一兆象**：`auspice` 只由 `zhenren_burn` 产生；卡片、占辞、现代解读都从它派生。模型不得改写。
 - **兆纹是艺术约定**：吉凶映射不是考古复原；真实兆象依赖钻凿位置、灼点、裂纹走向与卜辞语境。
 - **零网络、零遥测**：运行时只读随包 JSON 与字体；不调用外部占卜 API，不上传问题。
@@ -100,8 +101,10 @@ profile 覆盖示例：
 ## 目录
 
 ```text
-data/                     oracle.json、manifest、抽取报告、字体与 OFL
+data/                     oracle.json、manifest、抽取报告、字体与 OFL、精选图像 glyphs/
 scripts/extract-yigezi/   构建期抽取脚本（不随包运行）
+scripts/expand-hust/      HUST-OBC 覆盖审计、选字与图像归一化（构建期）
+scripts/vernacular/       白话转述草稿与合并脚本（构建期）
 src/data/                 加载、校验、查询
 src/ritual/               种子、吉凶、兆纹、布局、刻辞节奏
 src/tools/                zhenren_burn、zhenren_inscribe

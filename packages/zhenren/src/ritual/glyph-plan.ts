@@ -1,9 +1,9 @@
 /**
  * Turning text into carvable slots (CLAUDE.md §3.6, §4.4, §4.5).
  *
- * The 1,425-character boundary is enforced here and nowhere else: every Han
- * character becomes a slot, every slot is queried once, and an unknown
- * character keeps its slot as a 空刻 placeholder. Nothing is substituted.
+ * The corpus boundary is enforced here and nowhere else: every Han character
+ * becomes a slot, every slot is queried once, and an unknown character keeps
+ * its slot as a 空刻 placeholder. Nothing is substituted.
  */
 import { lookupOracle, splitHanCharacters } from '../data/lookup.js'
 import type { OracleIndex } from '../data/load.js'
@@ -54,21 +54,5 @@ export function toChargeGlyphs(plan: GlyphPlan): Array<{
       glyphChar: entry.lookup.glyphChar,
       glossFound: entry.lookup.shuowen !== null,
     }
-  })
-}
-
-/** Slot metadata shared by the inscribe result and its presentation meta. */
-export function toMetaGlyphs(plan: GlyphPlan): Array<{
-  slot: number
-  char: string
-  found: boolean
-  glyphChar?: string
-  placeholder?: boolean
-}> {
-  return plan.entries.map((entry) => {
-    if (!entry.lookup.found) {
-      return { slot: entry.slot, char: entry.char, found: false, placeholder: true }
-    }
-    return { slot: entry.slot, char: entry.char, found: true, glyphChar: entry.lookup.glyphChar }
   })
 }

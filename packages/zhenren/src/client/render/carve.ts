@@ -4,8 +4,12 @@
  * A glyph is revealed by an irregular staircase clip, top to bottom — the
  * order is visual only and does not claim to be stroke order. A missing
  * character renders as a shallow 空刻 pit, never as a synthesised glyph.
+ *
+ * The glyph shape itself comes from a {@link GlyphSource} (D17): an Oracular
+ * codepoint or a tinted HUST-OBC image. Both share this mask, ink and pressure.
  */
 import { createRng } from '../../shared/rng.js'
+import { stampGlyph, type GlyphSource } from './glyph-source.js'
 
 const CARVE_INK = 'rgba(38, 28, 20, 0.92)'
 const CARVE_EDGE = 'rgba(250, 242, 226, 0.35)'
@@ -13,8 +17,8 @@ const GHOST_INK = 'rgba(74, 58, 40, 0.16)'
 const PLACEHOLDER_INK = 'rgba(96, 78, 56, 0.28)'
 
 export interface CarvedGlyphInput {
-  /** Codepoint string drawn from the oracle font. */
-  char: string
+  /** Font codepoint or HUST-OBC image to carve. */
+  source: GlyphSource
   /** Centre in device pixels. */
   x: number
   y: number
@@ -25,7 +29,6 @@ export interface CarvedGlyphInput {
   /** 0.55..1; deeper pressure is darker and wider. */
   pressure: number
   maskSeed: number
-  fontFamily: string
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -69,21 +72,17 @@ function revealClip(
  */
 export function drawGlyphGhost(
   ctx: CanvasRenderingContext2D,
-  input: { char: string; x: number; y: number; size: number; fontFamily: string },
+  input: { source: GlyphSource; x: number; y: number; size: number },
 ): void {
-  if (input.char === '') return
+  if (input.source.char === '') return
   ctx.save()
-  ctx.font = `${input.size}px "${input.fontFamily}"`
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillStyle = GHOST_INK
-  ctx.fillText(input.char, input.x, input.y)
+  stampGlyph(ctx, input.source, input.x, input.y, input.size, GHOST_INK)
   ctx.restore()
 }
 
 /** A real glyph, revealed by the chisel mask. */
 export function drawCarvedGlyph(ctx: CanvasRenderingContext2D, input: CarvedGlyphInput): void {
-  if (input.progress <= 0 || input.char === '') return
+  if (input.progress <= 0 || input.source.char === '') return
   const size = input.size
   const left = input.x - size / 2
   const top = input.y - size / 2
@@ -91,18 +90,13 @@ export function drawCarvedGlyph(ctx: CanvasRenderingContext2D, input: CarvedGlyp
   ctx.save()
   revealClip(ctx, left, top, size, input.progress, input.maskSeed)
   ctx.clip()
-  ctx.font = `${size}px "${input.fontFamily}"`
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
 
   // Chisel highlight: a faint light edge under the incision.
-  ctx.fillStyle = CARVE_EDGE
-  ctx.fillText(input.char, input.x + size * 0.012, input.y + size * 0.012)
+  stampGlyph(ctx, input.source, input.x + size * 0.012, input.y + size * 0.012, size, CARVE_EDGE)
 
   const strength = clamp(0.55 + input.pressure * 0.45, 0.55, 1)
-  ctx.fillStyle = CARVE_INK
   ctx.globalAlpha = strength
-  ctx.fillText(input.char, input.x, input.y)
+  stampGlyph(ctx, input.source, input.x, input.y, size, CARVE_INK)
   ctx.globalAlpha = 1
   ctx.restore()
 }

@@ -3,8 +3,8 @@
  *
  * Two record layers plus one index:
  *   headwords  keyed by 说文 headword (朙 / 亾 / 㠯 ...), carries the gloss
- *   glyphs     keyed by glyphChar (one of the 1,425 oracle glyphs), points at
- *              a headword or `null`
+ *   glyphs     keyed by glyphChar (font codepoint or D17 image glyph), points
+ *              at a headword or `null`, tagged with its rendering `source`
  *   aliases    input form → glyphChar, keys disjoint from the glyph set
  *
  * Validation is hand-written on purpose: the runtime must not grow a schema
@@ -28,8 +28,8 @@ export interface ShuowenGloss {
   /** 逐字保留的《说文》原文；不删「凡……之屬皆从……」公式。 */
   original: string
   /**
-   * 现代白话转述。The extraction pipeline does not synthesize these, so the
-   * shipped corpus carries `''` until a human writes and reviews one.
+   * 现代白话转述。Build-time drafts merged from vernacular-overrides.json (D18);
+   * `''` until a human writes one. Always labelled a paraphrase, never 原文.
    */
   vernacular: string
   vernacularStatus: 'draft' | 'reviewed'
@@ -55,14 +55,41 @@ export type ResolvedBy =
   | 'ts'
   | 'none'
 
+/** Where a glyph is drawn from: the oracle font, or a D17 HUST-OBC image. */
+export type GlyphSource = 'font' | 'image'
+
+/** Provenance of a D17 image glyph (HUST-OBC deciphered, arXiv 2401.15365). */
+export interface GlyphImageProvenance {
+  /** PNG path relative to `data/`, e.g. `glyphs/798f.png`. */
+  file: string
+  /** HUST-OBC character ID. */
+  hustId: string
+  /** Original source name (新甲骨文编 / 国学大师 / 殷契文渊 / HWOBC / 六位数字编码). */
+  source: string
+  /** Citation as it appears in the source filename. */
+  citation: string
+  /** 合集号 parsed from the citation, or null. */
+  collection: string | null
+  /** 组类 parsed from the citation, or null. */
+  group: string | null
+}
+
 /** Glyph record, keyed by glyphChar. `headword: null` means glyph-only. */
 export interface GlyphRecord {
   headword: string | null
   resolvedBy: ResolvedBy
+  /** Rendering branch (D17). Font glyphs draw a codepoint; image glyphs a PNG. */
+  source: GlyphSource
+  /** Present only when `source === 'image'`. */
+  image?: GlyphImageProvenance
 }
 
 export interface OracleCounts {
   glyphs: number
+  /** Fixed font layer (1,425). */
+  fontGlyphs: number
+  /** D17 image glyphs added on top of the font layer. */
+  imageGlyphs: number
   glossedGlyphs: number
   glyphOnly: number
   headwords: number
@@ -74,7 +101,7 @@ export interface OracleCounts {
 export interface OracleData {
   schemaVersion: number
   generatedAt: string
-  source: { yigezi: string; shuowen: string; font: string }
+  source: { yigezi: string; shuowen: string; font: string; images: string }
   counts: OracleCounts
   headwords: Record<string, HeadwordRecord>
   glyphs: Record<string, GlyphRecord>
@@ -97,6 +124,8 @@ export interface OracleLookupFound {
   /** The glyphChar the query resolved to; may differ from `query`. */
   normalized: string
   glyphChar: string
+  /** Rendering branch of the resolved glyph (D17). */
+  glyphSource: GlyphSource
   headword: string | null
   shuowen: ShuowenGloss | null
   matchedBy: 'glyph' | 'alias'
@@ -113,10 +142,10 @@ export interface OracleLookupMissing {
   supportedCount: number
 }
 
-/** The only schemaVersion this build understands. */
-export const ORACLE_SCHEMA_VERSION = 1
+/** The only schemaVersion this build understands (D17 added the source dim). */
+export const ORACLE_SCHEMA_VERSION = 2
 
-/** Documented corpus size; used in error text and UI footers. */
+/** Fixed font-layer size. The full corpus boundary is `index.supportedCount`. */
 export const ORACLE_GLYPH_COUNT = 1425
 
 // ---------------------------------------------------------------------------
@@ -213,16 +242,38 @@ const RESOLVED_BY = new Set<ResolvedBy>([
   'none',
 ])
 
+function validateImageProvenance(value: unknown, path: string): GlyphImageProvenance {
+  const record = expectObject(value, path)
+  return {
+    file: expectString(record.file, `${path}.file`),
+    hustId: expectString(record.hustId, `${path}.hustId`),
+    source: expectString(record.source, `${path}.source`),
+    citation: expectString(record.citation, `${path}.citation`),
+    collection: expectNullableString(record.collection, `${path}.collection`),
+    group: expectNullableString(record.group, `${path}.group`),
+  }
+}
+
 function validateGlyph(value: unknown, path: string): GlyphRecord {
   const record = expectObject(value, path)
   const resolvedBy = record.resolvedBy
   if (typeof resolvedBy !== 'string' || !RESOLVED_BY.has(resolvedBy as ResolvedBy)) {
     fail(`${path}.resolvedBy`, 'must be a known resolution path')
   }
-  return {
-    headword: expectNullableString(record.headword, `${path}.headword`),
-    resolvedBy: resolvedBy as ResolvedBy,
+  const source = record.source
+  if (source !== 'font' && source !== 'image') {
+    fail(`${path}.source`, 'must be "font" or "image"')
   }
+  const headword = expectNullableString(record.headword, `${path}.headword`)
+  if (source === 'image') {
+    return {
+      headword,
+      resolvedBy: resolvedBy as ResolvedBy,
+      source,
+      image: validateImageProvenance(record.image, `${path}.image`),
+    }
+  }
+  return { headword, resolvedBy: resolvedBy as ResolvedBy, source }
 }
 
 /**
@@ -243,6 +294,8 @@ export function validateOracleData(raw: unknown): OracleData {
   const countsRaw = expectObject(root.counts, 'oracle.counts')
   const counts: OracleCounts = {
     glyphs: expectCount(countsRaw.glyphs, 'oracle.counts.glyphs'),
+    fontGlyphs: expectCount(countsRaw.fontGlyphs, 'oracle.counts.fontGlyphs'),
+    imageGlyphs: expectCount(countsRaw.imageGlyphs, 'oracle.counts.imageGlyphs'),
     glossedGlyphs: expectCount(countsRaw.glossedGlyphs, 'oracle.counts.glossedGlyphs'),
     glyphOnly: expectCount(countsRaw.glyphOnly, 'oracle.counts.glyphOnly'),
     headwords: expectCount(countsRaw.headwords, 'oracle.counts.headwords'),
@@ -295,6 +348,22 @@ export function validateOracleData(raw: unknown): OracleData {
   if (counts.glyphs !== Object.keys(glyphs).length) {
     fail('oracle.counts.glyphs', `says ${counts.glyphs}, data has ${Object.keys(glyphs).length}`)
   }
+  // D17: the source split must agree with the records and sum to the total.
+  let fontActual = 0
+  let imageActual = 0
+  for (const record of Object.values(glyphs)) {
+    if (record.source === 'image') imageActual += 1
+    else fontActual += 1
+  }
+  if (counts.fontGlyphs !== fontActual) {
+    fail('oracle.counts.fontGlyphs', `says ${counts.fontGlyphs}, data has ${fontActual}`)
+  }
+  if (counts.imageGlyphs !== imageActual) {
+    fail('oracle.counts.imageGlyphs', `says ${counts.imageGlyphs}, data has ${imageActual}`)
+  }
+  if (counts.fontGlyphs + counts.imageGlyphs !== counts.glyphs) {
+    fail('oracle.counts', 'fontGlyphs + imageGlyphs must equal glyphs')
+  }
   if (counts.headwords !== Object.keys(headwords).length) {
     fail('oracle.counts.headwords', `says ${counts.headwords}, data has ${Object.keys(headwords).length}`)
   }
@@ -309,6 +378,7 @@ export function validateOracleData(raw: unknown): OracleData {
       yigezi: expectString(source.yigezi, 'oracle.source.yigezi'),
       shuowen: expectString(source.shuowen, 'oracle.source.shuowen'),
       font: expectString(source.font, 'oracle.source.font'),
+      images: expectString(source.images, 'oracle.source.images'),
     },
     counts,
     headwords,

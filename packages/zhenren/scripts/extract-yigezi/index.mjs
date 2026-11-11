@@ -9,6 +9,12 @@
  *   data/fonts/OFL.txt           license text
  *   data/fonts/THIRD_PARTY_NOTICES.md
  *   data/alias-overrides.json    human-maintained overrides (created empty once)
+ *   data/vernacular-overrides.json  human/batch paraphrases (D18; created empty once)
+ *
+ * D17 expansion: when `data/hust-glyphs.json` is present (produced by
+ * scripts/expand-hust/build-images.py), its image glyphs are merged into the
+ * corpus with `source: "image"` and full provenance. The font layer stays
+ * exactly 1,425 glyphs; the total grows by the image count.
  *
  * Build-time only. Never imported by the plugin runtime. Deterministic:
  * the same snapshot plus the same overrides produce the same oracle.json.
@@ -30,9 +36,15 @@ const OUT = path.resolve(__dirname, '../../data')
 const FONT_OUT = path.join(OUT, 'fonts')
 const CHECK_ONLY = process.argv.includes('--check')
 
-const SCHEMA_VERSION = 1
+const SCHEMA_VERSION = 2
+/** The font layer is fixed; image glyphs (D17) are added on top of it. */
 const EXPECTED_GLYPH_COUNT = 1425
 const NON_CHARACTER_CODEPOINTS = new Set([0xffff])
+
+/** Sources-only attribution; the boundary sentence is product copy (locale). */
+const ATTRIBUTION =
+  '字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。'
+const BOUNDARY_SUFFIX = '兆纹为艺术化表现，非考古复原。'
 
 // ---------------------------------------------------------------------------
 // Source extraction
@@ -326,13 +338,33 @@ function attachCorrections(XZ, ctx, glyphToHeadword, aliases) {
 // Record generation
 // ---------------------------------------------------------------------------
 
-/** Build the two-layer oracle data plus the audit report. */
-function buildOracle(source, overrides) {
+/** Empty resolution tally. */
+function emptyResolution() {
+  return { 'manual-headword': 0, 'exact-sw': 0, 'reverse-w': 0, opencc: 0, ts: 0, none: 0 }
+}
+
+/**
+ * Build the two-layer oracle data plus the audit report.
+ * @param source   parsed yigezi snapshot (SW/TS/XZ/HAS_ORAC)
+ * @param overrides human alias/headword adjudications
+ * @param imageGlyphs D17 image-glyph manifest (char → provenance), or {}
+ * @param vernacular  D18 headword → modern paraphrase drafts, or {}
+ */
+function buildOracle(source, overrides, imageGlyphs, vernacular) {
   const { SW, TS, XZ, HAS_ORAC } = source
-  const glyphSet = new Set(HAS_ORAC)
-  if (glyphSet.size !== EXPECTED_GLYPH_COUNT) {
-    throw new Error(`invariant: HAS_ORAC must have ${EXPECTED_GLYPH_COUNT} unique glyphs, got ${glyphSet.size}`)
+  const fontGlyphSet = new Set(HAS_ORAC)
+  if (fontGlyphSet.size !== EXPECTED_GLYPH_COUNT) {
+    throw new Error(`invariant: HAS_ORAC must have ${EXPECTED_GLYPH_COUNT} unique glyphs, got ${fontGlyphSet.size}`)
   }
+
+  // D17: image glyphs extend the corpus but must not overlap the font layer.
+  const imageChars = Object.keys(imageGlyphs)
+  for (const char of imageChars) {
+    if (fontGlyphSet.has(char)) {
+      throw new Error(`invariant: image glyph ${char} overlaps the font cmap`)
+    }
+  }
+  const glyphSet = new Set([...HAS_ORAC, ...imageChars])
 
   const s2tw = OpenCC.Converter({ from: 'cn', to: 't' })
   const t2s = OpenCC.Converter({ from: 't', to: 'cn' })
@@ -352,24 +384,25 @@ function buildOracle(source, overrides) {
     else if (entry.kind === 'alias') manualAliases.set(entry.from, entry.to)
   }
 
-  // Resolve every glyph and group glyphs by headword.
+  // Resolve every glyph (font + image) and group glyphs by headword.
   const glyphToHeadword = new Map()
-  const resolution = { 'manual-headword': 0, 'exact-sw': 0, 'reverse-w': 0, opencc: 0, ts: 0, none: 0 }
+  const resolution = emptyResolution()
+  const fontResolution = emptyResolution()
+  const imageResolution = emptyResolution()
   const reverseConflicts = []
   const unresolved = []
-  for (const char of HAS_ORAC) {
+  const resolveInto = (char, tally) => {
     const resolved = resolveHeadword(char, ctx, manualHeadwords)
-    if (resolved.headword === null) {
-      glyphToHeadword.set(char, null)
-      unresolved.push(char)
-    } else {
-      glyphToHeadword.set(char, resolved.headword)
-    }
+    glyphToHeadword.set(char, resolved.headword)
+    if (resolved.headword === null) unresolved.push(char)
+    tally[resolved.resolvedBy] += 1
     resolution[resolved.resolvedBy] += 1
     if (resolved.conflicts.length > 0) {
       reverseConflicts.push({ char, headword: resolved.headword, candidates: resolved.conflicts[0] })
     }
   }
+  for (const char of HAS_ORAC) resolveInto(char, fontResolution)
+  for (const char of imageChars) resolveInto(char, imageResolution)
 
   const glyphsByHeadword = new Map()
   for (const [char, headword] of glyphToHeadword) {
@@ -388,18 +421,20 @@ function buildOracle(source, overrides) {
 
   // headwords
   const headwords = {}
+  let vernacularWritten = 0
   for (const headword of [...glyphsByHeadword.keys()].sort(byCodepoint)) {
     const record = SW[headword]
     if (record === undefined) throw new Error(`invariant: headword ${headword} missing from SW`)
     if (typeof record.e !== 'string' || record.e === '') {
       throw new Error(`invariant: headword ${headword} has empty 说文 original`)
     }
+    // D18: merge human/batch paraphrase drafts; absent ones stay empty.
+    const paraphrase = typeof vernacular[headword] === 'string' ? vernacular[headword].trim() : ''
+    if (paraphrase !== '') vernacularWritten += 1
     headwords[headword] = {
       shuowen: {
         original: record.e,
-        // The contract reserves a modern paraphrase. This pipeline does not
-        // synthesize one: it stays empty and is marked draft (content debt).
-        vernacular: '',
+        vernacular: paraphrase,
         vernacularStatus: 'draft',
         correction: corrections.get(headword) ?? null,
       },
@@ -410,13 +445,28 @@ function buildOracle(source, overrides) {
     }
   }
 
-  // glyphs
+  // glyphs (font + image, each tagged with its rendering source)
   const glyphs = {}
   for (const char of [...glyphSet].sort(byCodepoint)) {
     const headword = glyphToHeadword.get(char) ?? null
-    glyphs[char] = {
-      headword,
-      resolvedBy: resolveResolvedBy(char, headword, ctx, manualHeadwords, resolution),
+    const resolvedBy = resolveResolvedBy(char, headword, ctx, manualHeadwords, resolution)
+    const image = imageGlyphs[char]
+    if (image !== undefined) {
+      glyphs[char] = {
+        headword,
+        resolvedBy,
+        source: 'image',
+        image: {
+          file: image.file,
+          hustId: image.hustId,
+          source: image.source,
+          citation: image.citation,
+          collection: image.collection ?? null,
+          group: image.group ?? null,
+        },
+      }
+    } else {
+      glyphs[char] = { headword, resolvedBy, source: 'font' }
     }
   }
 
@@ -440,11 +490,19 @@ function buildOracle(source, overrides) {
   const glossedGlyphs = Object.values(glyphs).filter((record) => record.headword !== null).length
   const counts = {
     glyphs: Object.keys(glyphs).length,
+    fontGlyphs: HAS_ORAC.length,
+    imageGlyphs: imageChars.length,
     glossedGlyphs,
     glyphOnly: Object.keys(glyphs).length - glossedGlyphs,
     headwords: Object.keys(headwords).length,
     sharedHeadwords: sharedHeadwords.length,
     aliases: Object.keys(aliasObject).length,
+  }
+
+  const imageSources = {}
+  for (const char of imageChars) {
+    const name = imageGlyphs[char].source
+    imageSources[name] = (imageSources[name] ?? 0) + 1
   }
 
   return {
@@ -455,6 +513,7 @@ function buildOracle(source, overrides) {
         yigezi: 'yigezi-main snapshot (.refs/yigezi-main/index.html)',
         shuowen: 'shuowen.org via yigezi',
         font: 'Oracular (orac.woff2)',
+        images: 'HUST-OBC deciphered (arXiv 2401.15365)',
       },
       counts,
       headwords,
@@ -465,6 +524,8 @@ function buildOracle(source, overrides) {
       generatedAt: new Date().toISOString(),
       counts,
       resolution,
+      fontResolution,
+      imageResolution,
       automatic,
       unresolved,
       reverseConflicts,
@@ -472,7 +533,10 @@ function buildOracle(source, overrides) {
       aliasSources: Object.fromEntries([...aliasSources.entries()]),
       xz: xzLog,
       sharedHeadwords,
-      vernacularUnwritten: counts.headwords,
+      imageChars: [...imageChars].sort(byCodepoint),
+      imageSources,
+      vernacularWritten,
+      vernacularUnwritten: counts.headwords - vernacularWritten,
     },
   }
 }
@@ -529,24 +593,57 @@ function inspectFont(fontFile) {
 // ---------------------------------------------------------------------------
 
 /** Throw when the generated data violates the runtime contract. */
-function assertInvariants(data, fontChars, fontStats) {
+function assertInvariants(data, fontChars, fontStats, imageGlyphs, dataDir) {
   const failures = []
   const glyphKeys = Object.keys(data.glyphs)
   const headwordKeys = Object.keys(data.headwords)
-  if (glyphKeys.length !== EXPECTED_GLYPH_COUNT) {
-    failures.push(`glyphs must be ${EXPECTED_GLYPH_COUNT}, got ${glyphKeys.length}`)
+  const fontKeys = glyphKeys.filter((char) => data.glyphs[char].source === 'font')
+  const imageKeys = glyphKeys.filter((char) => data.glyphs[char].source === 'image')
+
+  // Font layer is fixed at 1,425 and must equal the font cmap exactly.
+  if (fontKeys.length !== EXPECTED_GLYPH_COUNT) {
+    failures.push(`font glyphs must be ${EXPECTED_GLYPH_COUNT}, got ${fontKeys.length}`)
   }
-  if (glyphKeys.length !== fontChars.size) {
-    failures.push(`glyphs (${glyphKeys.length}) must equal font cmap (${fontChars.size})`)
+  if (fontKeys.length !== fontChars.size) {
+    failures.push(`font glyphs (${fontKeys.length}) must equal font cmap (${fontChars.size})`)
   }
-  for (const char of glyphKeys) {
-    if (!fontChars.has(char)) failures.push(`glyph ${char} is absent from the font cmap`)
+  for (const char of fontKeys) {
+    if (!fontChars.has(char)) failures.push(`font glyph ${char} is absent from the font cmap`)
   }
-  if (fontChars.size !== glyphKeys.length) {
-    for (const char of fontChars) {
-      if (data.glyphs[char] === undefined) failures.push(`font cmap char ${char} is absent from glyphs`)
+  for (const char of fontChars) {
+    if (data.glyphs[char] === undefined) failures.push(`font cmap char ${char} is absent from glyphs`)
+  }
+
+  // Total = font + image; image glyphs carry provenance and a real PNG.
+  if (glyphKeys.length !== EXPECTED_GLYPH_COUNT + imageKeys.length) {
+    failures.push(`total glyphs (${glyphKeys.length}) must equal font + image (${EXPECTED_GLYPH_COUNT} + ${imageKeys.length})`)
+  }
+  if (data.counts.fontGlyphs !== fontKeys.length) {
+    failures.push(`counts.fontGlyphs (${data.counts.fontGlyphs}) != ${fontKeys.length}`)
+  }
+  if (data.counts.imageGlyphs !== imageKeys.length) {
+    failures.push(`counts.imageGlyphs (${data.counts.imageGlyphs}) != ${imageKeys.length}`)
+  }
+  for (const char of imageKeys) {
+    if (fontChars.has(char)) failures.push(`image glyph ${char} overlaps the font cmap`)
+    const image = data.glyphs[char].image
+    if (image === undefined) {
+      failures.push(`image glyph ${char} has no provenance`)
+      continue
+    }
+    for (const field of ['file', 'hustId', 'source', 'citation']) {
+      if (typeof image[field] !== 'string' || image[field] === '') {
+        failures.push(`image glyph ${char} provenance.${field} must be a non-empty string`)
+      }
+    }
+    if (typeof image.file === 'string' && !fs.existsSync(path.join(dataDir, image.file))) {
+      failures.push(`image glyph ${char} PNG missing: ${image.file}`)
+    }
+    if (imageGlyphs[char] === undefined) {
+      failures.push(`image glyph ${char} is absent from hust-glyphs.json`)
     }
   }
+
   for (const char of glyphKeys) {
     const headword = data.glyphs[char].headword
     if (headword !== null && data.headwords[headword] === undefined) {
@@ -620,6 +717,47 @@ function loadOverrides(file) {
   return parsed
 }
 
+/**
+ * Load the D17 image-glyph manifest produced by expand-hust/build-images.py.
+ * Absent means "no expansion": the corpus stays font-only. Never created here.
+ * @returns {Record<string, object>} char → provenance
+ */
+function loadImageGlyphs(file) {
+  if (!fs.existsSync(file)) return {}
+  const parsed = JSON.parse(readText(file))
+  if (parsed === null || typeof parsed !== 'object' || typeof parsed.glyphs !== 'object') {
+    throw new Error('hust-glyphs.json must be an object with a glyphs map')
+  }
+  for (const [char, entry] of Object.entries(parsed.glyphs)) {
+    const where = `hust-glyphs.json.glyphs.${char}`
+    if (entry === null || typeof entry !== 'object') throw new Error(`${where} must be an object`)
+    for (const key of ['file', 'hustId', 'source', 'citation']) {
+      if (typeof entry[key] !== 'string' || entry[key] === '') throw new Error(`${where}.${key} must be a non-empty string`)
+    }
+  }
+  return parsed.glyphs
+}
+
+/**
+ * Load the D18 vernacular paraphrase table (headword → modern draft).
+ * Human/batch artifact: created empty once, never overwritten by re-extraction.
+ * @returns {Record<string, string>}
+ */
+function loadVernacular(file) {
+  if (!fs.existsSync(file)) {
+    if (!CHECK_ONLY) writeFile(file, '{}\n')
+    return {}
+  }
+  const parsed = JSON.parse(readText(file))
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('vernacular-overrides.json must be a JSON object keyed by headword')
+  }
+  for (const [headword, value] of Object.entries(parsed)) {
+    if (typeof value !== 'string') throw new Error(`vernacular-overrides.json.${headword} must be a string`)
+  }
+  return parsed
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -634,10 +772,14 @@ function main() {
   const source = extractSource(html)
   const overridesFile = path.join(OUT, 'alias-overrides.json')
   const overrides = loadOverrides(overridesFile)
-  const { data, report } = buildOracle(source, overrides)
+  const imageGlyphsFile = path.join(OUT, 'hust-glyphs.json')
+  const imageGlyphs = loadImageGlyphs(imageGlyphsFile)
+  const vernacularFile = path.join(OUT, 'vernacular-overrides.json')
+  const vernacular = loadVernacular(vernacularFile)
+  const { data, report } = buildOracle(source, overrides, imageGlyphs, vernacular)
 
   const font = inspectFont(fontFile)
-  assertInvariants(data, font.chars, font.stats)
+  assertInvariants(data, font.chars, font.stats, imageGlyphs, OUT)
 
   const manifest = {
     schemaVersion: SCHEMA_VERSION,
@@ -649,6 +791,8 @@ function main() {
       fontBytes: fs.statSync(fontFile).size,
       opencc: 'opencc-js 1.4.2 (build-time only)',
       shuowen: 'shuowen.org via yigezi',
+      images: 'HUST-OBC deciphered (arXiv 2401.15365)',
+      hustGlyphsSha256: fs.existsSync(imageGlyphsFile) ? sha256File(imageGlyphsFile) : null,
     },
     counts: data.counts,
     font: font.stats,
@@ -657,9 +801,9 @@ function main() {
       shuowen: 'Apache-2.0',
       yigezi: 'MIT',
       opencc: 'Apache-2.0 (build-time only)',
+      images: 'public-domain glyphs (HUST-OBC, arXiv 2401.15365)',
     },
-    attribution:
-      '字形：Oracular（OFL-1.1）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。兆纹为艺术化表现，非考古复原。',
+    attribution: `${ATTRIBUTION}${BOUNDARY_SUFFIX}`,
   }
 
   if (!CHECK_ONLY) {

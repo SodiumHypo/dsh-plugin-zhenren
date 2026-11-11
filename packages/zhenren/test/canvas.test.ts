@@ -79,7 +79,12 @@ describe('omen rendering', () => {
 
   it('lays down a faint guide glyph before the chisel starts', () => {
     const { ctx, texts } = fakeContext()
-    drawGlyphGhost(ctx, { char: '雨', x: 120, y: 80, size: 40, fontFamily: 'Oracular' })
+    drawGlyphGhost(ctx, {
+      source: { kind: 'font', char: '雨', fontFamily: 'Oracular' },
+      x: 120,
+      y: 80,
+      size: 40,
+    })
     expect(texts).toEqual(['雨'])
   })
 })

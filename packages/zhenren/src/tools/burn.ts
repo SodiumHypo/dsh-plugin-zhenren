@@ -71,6 +71,7 @@ const BURN_OUTPUT = {
     burnPoint: { required: true, ...pointSchema },
     chargeGlyphs: { type: 'array', items: chargeGlyphSchema, required: true },
     missing: { type: 'array', items: { type: 'string' }, required: true },
+    supportedCount: { type: 'integer', required: true },
     attribution: { type: 'string', required: true },
   },
 } as const
@@ -163,6 +164,7 @@ export function createBurnTool(deps: BurnDeps) {
           animation: config.animation,
           showShuowen: config.showShuowen,
           locale: config.locale,
+          supportedCount: value.supportedCount,
           attribution: ATTRIBUTION,
         }
       },
@@ -223,6 +225,7 @@ export function createBurnTool(deps: BurnDeps) {
         burnPoint,
         chargeGlyphs: toChargeGlyphs(plan),
         missing: plan.missing,
+        supportedCount: index.supportedCount,
         attribution: ATTRIBUTION,
       }
     },

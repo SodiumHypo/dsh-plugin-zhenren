@@ -10,8 +10,12 @@
 export const TOOL_BURN = 'zhenren_burn'
 export const TOOL_INSCRIBE = 'zhenren_inscribe'
 
-/** Presentation-meta version understood by this build. */
-export const META_VERSION = 1
+/**
+ * Presentation-meta version emitted by this build (D17 added `glyphSource`).
+ * The parsers also accept v1 metas so restored sessions still draw; see
+ * {@link isMetaVersion}.
+ */
+export const META_VERSION = 2
 
 /**
  * Source attribution returned to the model and shown in card footers.
@@ -19,7 +23,7 @@ export const META_VERSION = 1
  * locale dictionary (`card.boundary`), so it must not be duplicated here.
  */
 export const ATTRIBUTION =
-  '字形：Oracular（OFL-1.1）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。'
+  '字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。'
 
 /**
  * Early v1 metas appended the boundary sentence to `attribution`, while the
@@ -99,6 +103,9 @@ export type OmenReading = {
 /** Client-side animation level carried in meta from the host config. */
 export type AnimationLevel = 'full' | 'reduced' | 'off'
 
+/** Rendering branch of a carved glyph (D17): font codepoint or HUST image. */
+export type MetaGlyphSource = 'font' | 'image'
+
 /**
  * One carved slot as the client must draw it.
  *
@@ -114,6 +121,8 @@ export type MetaGlyph = {
   glyphChar: string | null
   /** True when the slot is deliberately left blank (空刻). */
   placeholder: boolean
+  /** Which renderer draws this slot. v1 metas default to `font`. */
+  glyphSource: MetaGlyphSource
 }
 
 /** One slot position in normalized coordinates. */
@@ -164,6 +173,8 @@ export type BurnPresentationMeta = {
   animation: AnimationLevel
   showShuowen: boolean
   locale: string
+  /** Corpus size (glyphs.size) for the dynamic footer boundary line (D19). */
+  supportedCount: number
   attribution: string
 }
 
@@ -185,6 +196,8 @@ export type InscribePresentationMeta = {
   animation: AnimationLevel
   showShuowen: boolean
   locale: string
+  /** Corpus size (glyphs.size) for the dynamic footer boundary line (D19). */
+  supportedCount: number
   attribution: string
 }
 
@@ -266,6 +279,25 @@ function isAuspice(value: unknown): value is Auspice {
   return value === '吉' || value === '凶' || value === '中性'
 }
 
+/**
+ * Metas this build can draw. v1 predates D17 (font-only glyphs); v2 carries
+ * `glyphSource`. Anything newer falls back to text rather than guessing.
+ */
+function isMetaVersion(value: unknown): value is 1 | 2 {
+  return value === 1 || value === 2
+}
+
+/**
+ * Read a glyph's rendering branch. v1 metas have no `glyphSource` and default
+ * to `font`. A v2 found-glyph must carry a valid branch; a missing or unknown
+ * one means the meta is corrupt, so the caller falls back to text.
+ */
+function readGlyphSource(value: unknown, metaVersion: 1 | 2, found: boolean): MetaGlyphSource | null {
+  if (value === 'font' || value === 'image') return value
+  if (!found || metaVersion === 1) return 'font'
+  return null
+}
+
 /** Old metas predate these fields; default rather than reject them. */
 function readAnimation(value: unknown): AnimationLevel {
   return value === 'reduced' || value === 'off' || value === 'full' ? value : 'full'
@@ -279,10 +311,18 @@ function readLocale(value: unknown): string {
   return typeof value === 'string' && value !== '' ? value : 'zh-CN'
 }
 
+/**
+ * Corpus size for the footer boundary line (D19). Old metas predates the field;
+ * degrade to 0 so the card omits the count line rather than rejecting the meta.
+ */
+function readSupportedCount(value: unknown): number {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : 0
+}
+
 /** Validate a burn meta. Returns `null` when the card must fall back to text. */
 export function parseBurnMeta(value: unknown): BurnPresentationMeta | null {
   if (!isObject(value)) return null
-  if (value.version !== META_VERSION || value.kind !== 'zhenren.burn') return null
+  if (!isMetaVersion(value.version) || value.kind !== 'zhenren.burn') return null
   const { divinationId, seed, question, charge, shellSeed, attribution } = value
   if (typeof divinationId !== 'string' || typeof seed !== 'string') return null
   if (typeof question !== 'string' || typeof charge !== 'string') return null
@@ -308,6 +348,7 @@ export function parseBurnMeta(value: unknown): BurnPresentationMeta | null {
     animation: readAnimation(value.animation),
     showShuowen: readShowShuowen(value.showShuowen),
     locale: readLocale(value.locale),
+    supportedCount: readSupportedCount(value.supportedCount),
     attribution: normalizeAttribution(attribution),
   }
 }
@@ -315,7 +356,8 @@ export function parseBurnMeta(value: unknown): BurnPresentationMeta | null {
 /** Validate an inscribe meta. Returns `null` when the card must fall back. */
 export function parseInscribeMeta(value: unknown): InscribePresentationMeta | null {
   if (!isObject(value)) return null
-  if (value.version !== META_VERSION || value.kind !== 'zhenren.inscribe') return null
+  if (!isMetaVersion(value.version) || value.kind !== 'zhenren.inscribe') return null
+  const metaVersion = value.version
   const { divinationId, burnSeed, attribution } = value
   if (typeof divinationId !== 'string' || typeof burnSeed !== 'string') return null
   if (typeof attribution !== 'string') return null
@@ -326,6 +368,8 @@ export function parseInscribeMeta(value: unknown): InscribePresentationMeta | nu
     if (!isObject(entry)) return null
     if (typeof entry.slot !== 'number' || typeof entry.char !== 'string') return null
     if (typeof entry.found !== 'boolean') return null
+    const glyphSource = readGlyphSource(entry.glyphSource, metaVersion, entry.found)
+    if (glyphSource === null) return null
     if (entry.found) {
       if (typeof entry.glyphChar !== 'string') return null
       glyphs.push({
@@ -334,6 +378,7 @@ export function parseInscribeMeta(value: unknown): InscribePresentationMeta | nu
         found: true,
         glyphChar: entry.glyphChar,
         placeholder: false,
+        glyphSource,
       })
     } else {
       glyphs.push({
@@ -342,6 +387,7 @@ export function parseInscribeMeta(value: unknown): InscribePresentationMeta | nu
         found: false,
         glyphChar: null,
         placeholder: true,
+        glyphSource,
       })
     }
   }
@@ -413,6 +459,7 @@ export function parseInscribeMeta(value: unknown): InscribePresentationMeta | nu
     animation: readAnimation(value.animation),
     showShuowen: readShowShuowen(value.showShuowen),
     locale: readLocale(value.locale),
+    supportedCount: readSupportedCount(value.supportedCount),
     attribution: normalizeAttribution(attribution),
   }
 }

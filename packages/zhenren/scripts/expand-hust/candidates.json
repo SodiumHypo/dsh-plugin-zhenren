@@ -1,0 +1,6250 @@
+{
+  "generatedFrom": "HUST-OBC deciphered ID_to_chinese.json",
+  "total": 484,
+  "candidates": [
+    {
+      "char": "㐁",
+      "id": "0001",
+      "dir": "0001",
+      "fileCount": 35,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㐭",
+      "id": "0002",
+      "dir": "0002",
+      "fileCount": 53,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㐱",
+      "id": "0003",
+      "dir": "0003",
+      "fileCount": 25,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㒸",
+      "id": "0004",
+      "dir": "0004",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㓞",
+      "id": "0005",
+      "dir": "0005",
+      "fileCount": 25,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㕚",
+      "id": "0305",
+      "dir": "0304_0305",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㕢",
+      "id": "0006",
+      "dir": "0006",
+      "fileCount": 16,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㕣",
+      "id": "0007",
+      "dir": "0007",
+      "fileCount": 13,
+      "sources": [
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㕯",
+      "id": "0008",
+      "dir": "0008",
+      "fileCount": 24,
+      "sources": [
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㗊",
+      "id": "0009",
+      "dir": "0009",
+      "fileCount": 28,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㘝",
+      "id": "0010",
+      "dir": "0010",
+      "fileCount": 27,
+      "sources": [
+        "G",
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㚔",
+      "id": "0011",
+      "dir": "0011_0012_0013",
+      "fileCount": 56,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㚤",
+      "id": "0014",
+      "dir": "0014",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㚩",
+      "id": "0015",
+      "dir": "0015_0016",
+      "fileCount": 7,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㚵",
+      "id": "0017",
+      "dir": "0017",
+      "fileCount": 24,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㚸",
+      "id": "0018",
+      "dir": "0018",
+      "fileCount": 47,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㛝",
+      "id": "0019",
+      "dir": "0019",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㝃",
+      "id": "0491",
+      "dir": "0489_0490_0491",
+      "fileCount": 8,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㝡",
+      "id": "0020",
+      "dir": "0020",
+      "fileCount": 24,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㝪",
+      "id": "0021",
+      "dir": "0021",
+      "fileCount": 29,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㝱",
+      "id": "0426",
+      "dir": "0425_0426",
+      "fileCount": 18,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㝵",
+      "id": "0673",
+      "dir": "0672_0673_0674",
+      "fileCount": 52,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㞤",
+      "id": "0022",
+      "dir": "0022",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㠭",
+      "id": "0023",
+      "dir": "0023_0024",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㠱",
+      "id": "0027",
+      "dir": "0027",
+      "fileCount": 37,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㡭",
+      "id": "0028",
+      "dir": "0028",
+      "fileCount": 29,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㢀",
+      "id": "0029",
+      "dir": "0029",
+      "fileCount": 22,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㢟",
+      "id": "0030",
+      "dir": "0030",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㣇",
+      "id": "0031",
+      "dir": "0031",
+      "fileCount": 8,
+      "sources": [
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㣈",
+      "id": "0032",
+      "dir": "0032",
+      "fileCount": 7,
+      "sources": [
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㣙",
+      "id": "0033",
+      "dir": "0033",
+      "fileCount": 5,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㦰",
+      "id": "0034",
+      "dir": "0034",
+      "fileCount": 59,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㪔",
+      "id": "0753",
+      "dir": "0752_0753",
+      "fileCount": 8,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㫃",
+      "id": "0035",
+      "dir": "0035",
+      "fileCount": 72,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㭉",
+      "id": "0036",
+      "dir": "0036",
+      "fileCount": 27,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㭒",
+      "id": "0037",
+      "dir": "0037",
+      "fileCount": 9,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㮚",
+      "id": "0862",
+      "dir": "0861_0862",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㯥",
+      "id": "0038",
+      "dir": "0038",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㯱",
+      "id": "0039",
+      "dir": "0039",
+      "fileCount": 24,
+      "sources": [
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㱃",
+      "id": "1595",
+      "dir": "1594_1595",
+      "fileCount": 30,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㱿",
+      "id": "0040",
+      "dir": "0040",
+      "fileCount": 107,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㲃",
+      "id": "1738",
+      "dir": "1736_1737_1738",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㲋",
+      "id": "0041",
+      "dir": "0041_0042",
+      "fileCount": 39,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㲹",
+      "id": "0043",
+      "dir": "0043",
+      "fileCount": 22,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㲻",
+      "id": "0589",
+      "dir": "0587_0588_0589",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㳄",
+      "id": "0044",
+      "dir": "0044",
+      "fileCount": 61,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㴩",
+      "id": "0045",
+      "dir": "0045",
+      "fileCount": 22,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㴪",
+      "id": "0046",
+      "dir": "0046",
+      "fileCount": 32,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㵢",
+      "id": "0047",
+      "dir": "0047",
+      "fileCount": 23,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㹜",
+      "id": "0048",
+      "dir": "0048_0049",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㹞",
+      "id": "0050",
+      "dir": "0050",
+      "fileCount": 26,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㺇",
+      "id": "0051",
+      "dir": "0051",
+      "fileCount": 18,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㽙",
+      "id": "0052",
+      "dir": "0052_0053",
+      "fileCount": 29,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "㿝",
+      "id": "1121",
+      "dir": "1120_1121",
+      "fileCount": 27,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䀠",
+      "id": "0054",
+      "dir": "0054",
+      "fileCount": 10,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䂫",
+      "id": "0055",
+      "dir": "0055",
+      "fileCount": 22,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䄆",
+      "id": "0056",
+      "dir": "0056",
+      "fileCount": 20,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䆁",
+      "id": "0057",
+      "dir": "0057",
+      "fileCount": 23,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䇂",
+      "id": "0058",
+      "dir": "0058",
+      "fileCount": 131,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䊤",
+      "id": "0059",
+      "dir": "0059",
+      "fileCount": 37,
+      "sources": [
+        "G",
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䋙",
+      "id": "0060",
+      "dir": "0060",
+      "fileCount": 29,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䋣",
+      "id": "0061",
+      "dir": "0061",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䍜",
+      "id": "0062",
+      "dir": "0062_0063",
+      "fileCount": 91,
+      "sources": [
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䍡",
+      "id": "0064",
+      "dir": "0064",
+      "fileCount": 12,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䖵",
+      "id": "0065",
+      "dir": "0065",
+      "fileCount": 50,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䜌",
+      "id": "0066",
+      "dir": "0066",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䝭",
+      "id": "0067",
+      "dir": "0067",
+      "fileCount": 30,
+      "sources": [
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䟴",
+      "id": "0068",
+      "dir": "0068",
+      "fileCount": 15,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䠟",
+      "id": "0069",
+      "dir": "0069",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䢅",
+      "id": "0070",
+      "dir": "0070_0071",
+      "fileCount": 47,
+      "sources": [
+        "G",
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䢔",
+      "id": "0072",
+      "dir": "0072",
+      "fileCount": 33,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䧅",
+      "id": "0073",
+      "dir": "0073",
+      "fileCount": 36,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䧘",
+      "id": "0074",
+      "dir": "0074",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䨊",
+      "id": "0075",
+      "dir": "0075",
+      "fileCount": 9,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䨣",
+      "id": "0076",
+      "dir": "0076",
+      "fileCount": 25,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䨮",
+      "id": "1565",
+      "dir": "1564_1565",
+      "fileCount": 15,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䮯",
+      "id": "0077",
+      "dir": "0077",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䯉",
+      "id": "0078",
+      "dir": "0078",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䲨",
+      "id": "1641",
+      "dir": "1639_1640_1641",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䵼",
+      "id": "0079",
+      "dir": "0079",
+      "fileCount": 90,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "䶬",
+      "id": "0080",
+      "dir": "0080",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "丏",
+      "id": "0090",
+      "dir": "0090",
+      "fileCount": 12,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "主",
+      "id": "0101",
+      "dir": "0101",
+      "fileCount": 35,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "亂",
+      "id": "0113",
+      "dir": "0113_0114",
+      "fileCount": 1,
+      "sources": [
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "亲",
+      "id": "0133",
+      "dir": "0133",
+      "fileCount": 23,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "仄",
+      "id": "0136",
+      "dir": "0136",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "侗",
+      "id": "0157",
+      "dir": "0157",
+      "fileCount": 5,
+      "sources": [
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "依",
+      "id": "0160",
+      "dir": "0160",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "倉",
+      "id": "0169",
+      "dir": "0169",
+      "fileCount": 30,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "倞",
+      "id": "0171",
+      "dir": "0171",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "值",
+      "id": "0172",
+      "dir": "0172",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "僤",
+      "id": "0178",
+      "dir": "0178",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "兀",
+      "id": "0179",
+      "dir": "0179",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "兂",
+      "id": "0181",
+      "dir": "0181",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "免",
+      "id": "0191",
+      "dir": "0191",
+      "fileCount": 7,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "內",
+      "id": "0196",
+      "dir": "0196_0197",
+      "fileCount": 40,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "兩",
+      "id": "0198",
+      "dir": "0198",
+      "fileCount": 3,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "冃",
+      "id": "0209",
+      "dir": "0209",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "冄",
+      "id": "0211",
+      "dir": "0210_0211",
+      "fileCount": 1,
+      "sources": [
+        "G"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "内",
+      "id": "0197",
+      "dir": "0196_0197",
+      "fileCount": 6,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "冡",
+      "id": "1534",
+      "dir": "1533_1534_1535",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "冥",
+      "id": "0490",
+      "dir": "0489_0490_0491",
+      "fileCount": 21,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "冬",
+      "id": "1232",
+      "dir": "1231_1232",
+      "fileCount": 24,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "刻",
+      "id": "0239",
+      "dir": "0239",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "前",
+      "id": "0901",
+      "dir": "0900_0901",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "割",
+      "id": "0245",
+      "dir": "0245",
+      "fileCount": 14,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "勺",
+      "id": "0254",
+      "dir": "0254",
+      "fileCount": 6,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "勽",
+      "id": "0376",
+      "dir": "0375_0376",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "医",
+      "id": "0265",
+      "dir": "0265",
+      "fileCount": 5,
+      "sources": [
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "卑",
+      "id": "0275",
+      "dir": "0275",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "卓",
+      "id": "0276",
+      "dir": "0276",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "博",
+      "id": "0278",
+      "dir": "0278",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "厃",
+      "id": "0293",
+      "dir": "0293",
+      "fileCount": 27,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "厤",
+      "id": "0296",
+      "dir": "0296",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "反",
+      "id": "0308",
+      "dir": "0308",
+      "fileCount": 6,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "叒",
+      "id": "1342",
+      "dir": "1341_1342",
+      "fileCount": 19,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "吅",
+      "id": "0327",
+      "dir": "0327_0328",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "吠",
+      "id": "0340",
+      "dir": "0340",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "嗣",
+      "id": "0370",
+      "dir": "0370",
+      "fileCount": 11,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "囚",
+      "id": "0375",
+      "dir": "0375_0376",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "固",
+      "id": "0382",
+      "dir": "0382_0383",
+      "fileCount": 14,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "埽",
+      "id": "0404",
+      "dir": "0404",
+      "fileCount": 16,
+      "sources": [
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "墨",
+      "id": "0411",
+      "dir": "0411",
+      "fileCount": 1,
+      "sources": [
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "墮",
+      "id": "1542",
+      "dir": "1541_1542",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "夊",
+      "id": "0416",
+      "dir": "0416",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "夏",
+      "id": "0418",
+      "dir": "0418",
+      "fileCount": 17,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "太",
+      "id": "0430",
+      "dir": "0430",
+      "fileCount": 24,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "奉",
+      "id": "0439",
+      "dir": "0439",
+      "fileCount": 22,
+      "sources": [
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "奔",
+      "id": "0441",
+      "dir": "0441",
+      "fileCount": 34,
+      "sources": [
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "妟",
+      "id": "0460",
+      "dir": "0460",
+      "fileCount": 10,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "妦",
+      "id": "0463",
+      "dir": "0463",
+      "fileCount": 25,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "妬",
+      "id": "0464",
+      "dir": "0464",
+      "fileCount": 46,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "姂",
+      "id": "0471",
+      "dir": "0471",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "姌",
+      "id": "0016",
+      "dir": "0015_0016",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "姝",
+      "id": "0477",
+      "dir": "0477",
+      "fileCount": 30,
+      "sources": [
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "姸",
+      "id": "0456",
+      "dir": "0455_0456",
+      "fileCount": 9,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "婭",
+      "id": "0484",
+      "dir": "0483_0484",
+      "fileCount": 6,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "媰",
+      "id": "0500",
+      "dir": "0500",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "媵",
+      "id": "0502",
+      "dir": "0502",
+      "fileCount": 48,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "媿",
+      "id": "0503",
+      "dir": "0503",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "嬖",
+      "id": "0507",
+      "dir": "0507",
+      "fileCount": 12,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "嬪",
+      "id": "1447",
+      "dir": "1446_1447",
+      "fileCount": 11,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "孖",
+      "id": "0510",
+      "dir": "0510",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "孛",
+      "id": "0512",
+      "dir": "0512",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "宂",
+      "id": "0221",
+      "dir": "0220_0221",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "宦",
+      "id": "0539",
+      "dir": "0539",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "宷",
+      "id": "0541",
+      "dir": "0540_0541",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "寑",
+      "id": "0560",
+      "dir": "0558_0559_0560",
+      "fileCount": 11,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "寕",
+      "id": "0564",
+      "dir": "0562_0563_0564",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "寜",
+      "id": "0563",
+      "dir": "0562_0563_0564",
+      "fileCount": 20,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "尌",
+      "id": "0574",
+      "dir": "0574",
+      "fileCount": 23,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "少",
+      "id": "0577",
+      "dir": "0577",
+      "fileCount": 20,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "尿",
+      "id": "0587",
+      "dir": "0587_0588_0589",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "展",
+      "id": "0024",
+      "dir": "0023_0024",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "嵗",
+      "id": "0903",
+      "dir": "0902_0903",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "嶭",
+      "id": "0600",
+      "dir": "0600",
+      "fileCount": 33,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "巾",
+      "id": "0611",
+      "dir": "0611",
+      "fileCount": 6,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "幸",
+      "id": "0012",
+      "dir": "0011_0012_0013",
+      "fileCount": 37,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "廄",
+      "id": "0633",
+      "dir": "0633",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "弁",
+      "id": "0641",
+      "dir": "0641",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "弄",
+      "id": "0642",
+      "dir": "0642",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "弦",
+      "id": "0651",
+      "dir": "0651",
+      "fileCount": 15,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "彊",
+      "id": "0653",
+      "dir": "0653_0654",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "役",
+      "id": "0146",
+      "dir": "0145_0146",
+      "fileCount": 24,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "忻",
+      "id": "0688",
+      "dir": "0688",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "怀",
+      "id": "0689",
+      "dir": "0689",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "恆",
+      "id": "0691",
+      "dir": "0690_0691",
+      "fileCount": 9,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "戾",
+      "id": "0720",
+      "dir": "0720",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "扔",
+      "id": "0722",
+      "dir": "0722",
+      "fileCount": 6,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "拇",
+      "id": "0728",
+      "dir": "0728",
+      "fileCount": 23,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "拘",
+      "id": "0730",
+      "dir": "0730",
+      "fileCount": 3,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "捊",
+      "id": "0732",
+      "dir": "0732",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "掔",
+      "id": "0734",
+      "dir": "0734",
+      "fileCount": 8,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "掫",
+      "id": "0735",
+      "dir": "0735",
+      "fileCount": 20,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "摯",
+      "id": "0736",
+      "dir": "0736",
+      "fileCount": 6,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "攣",
+      "id": "0740",
+      "dir": "0740",
+      "fileCount": 22,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "敖",
+      "id": "0746",
+      "dir": "0746",
+      "fileCount": 20,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "斫",
+      "id": "0761",
+      "dir": "0761_0762",
+      "fileCount": 13,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "斻",
+      "id": "1328",
+      "dir": "1327_1328",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "施",
+      "id": "1728",
+      "dir": "1727_1728",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "旐",
+      "id": "0770",
+      "dir": "0770",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "昱",
+      "id": "1263",
+      "dir": "1261_1262_1263",
+      "fileCount": 15,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "晛",
+      "id": "0791",
+      "dir": "0791",
+      "fileCount": 7,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "晻",
+      "id": "0797",
+      "dir": "0797",
+      "fileCount": 6,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "書",
+      "id": "0806",
+      "dir": "0806",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "曼",
+      "id": "0809",
+      "dir": "0809",
+      "fileCount": 65,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "朁",
+      "id": "0813",
+      "dir": "0813",
+      "fileCount": 8,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "杗",
+      "id": "0839",
+      "dir": "0839",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "柄",
+      "id": "0854",
+      "dir": "0854",
+      "fileCount": 6,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "桷",
+      "id": "0867",
+      "dir": "0867",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "梁",
+      "id": "0868",
+      "dir": "0868",
+      "fileCount": 4,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "椃",
+      "id": "0874",
+      "dir": "0874",
+      "fileCount": 12,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "槃",
+      "id": "0880",
+      "dir": "0880",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "樴",
+      "id": "0883",
+      "dir": "0883",
+      "fileCount": 12,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "檆",
+      "id": "0836",
+      "dir": "0835_0836",
+      "fileCount": 3,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "櫛",
+      "id": "0890",
+      "dir": "0890",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "欶",
+      "id": "0894",
+      "dir": "0894",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "歬",
+      "id": "0900",
+      "dir": "0900_0901",
+      "fileCount": 6,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "毌",
+      "id": "0914",
+      "dir": "0914",
+      "fileCount": 7,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "毖",
+      "id": "0920",
+      "dir": "0920",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "汎",
+      "id": "0929",
+      "dir": "0929",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "汓",
+      "id": "0932",
+      "dir": "0932",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "汩",
+      "id": "0935",
+      "dir": "0935",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "沌",
+      "id": "0941",
+      "dir": "0941",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "洎",
+      "id": "0954",
+      "dir": "0954",
+      "fileCount": 7,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "洧",
+      "id": "0959",
+      "dir": "0959",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "浥",
+      "id": "0963",
+      "dir": "0963",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "浴",
+      "id": "0964",
+      "dir": "0964",
+      "fileCount": 11,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "浿",
+      "id": "0965",
+      "dir": "0965",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "涿",
+      "id": "0971",
+      "dir": "0971",
+      "fileCount": 9,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "游",
+      "id": "0978",
+      "dir": "0978",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "湔",
+      "id": "0980",
+      "dir": "0980",
+      "fileCount": 5,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "溺",
+      "id": "0588",
+      "dir": "0587_0588_0589",
+      "fileCount": 9,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "溼",
+      "id": "0983",
+      "dir": "0983",
+      "fileCount": 19,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "滴",
+      "id": "0985",
+      "dir": "0984_0985",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "漉",
+      "id": "0987",
+      "dir": "0987",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "澎",
+      "id": "0994",
+      "dir": "0994",
+      "fileCount": 8,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "濯",
+      "id": "1000",
+      "dir": "1000",
+      "fileCount": 24,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "瀑",
+      "id": "1002",
+      "dir": "1002",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "瀕",
+      "id": "1003",
+      "dir": "1003",
+      "fileCount": 4,
+      "sources": [
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "煏",
+      "id": "1023",
+      "dir": "1023",
+      "fileCount": 9,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "熊",
+      "id": "1025",
+      "dir": "1025",
+      "fileCount": 25,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "燀",
+      "id": "1028",
+      "dir": "1028",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "燓",
+      "id": "1019",
+      "dir": "1018_1019",
+      "fileCount": 63,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "片",
+      "id": "1046",
+      "dir": "1046",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "牲",
+      "id": "1054",
+      "dir": "1054",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "犾",
+      "id": "0049",
+      "dir": "0048_0049",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "狂",
+      "id": "1059",
+      "dir": "1059",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "狄",
+      "id": "1060",
+      "dir": "1060",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "畯",
+      "id": "0053",
+      "dir": "0052_0053",
+      "fileCount": 17,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "疆",
+      "id": "0654",
+      "dir": "0653_0654",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "疌",
+      "id": "1104",
+      "dir": "1104",
+      "fileCount": 3,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "皃",
+      "id": "1122",
+      "dir": "1122",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "皇",
+      "id": "1124",
+      "dir": "1124",
+      "fileCount": 10,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "盆",
+      "id": "1128",
+      "dir": "1128",
+      "fileCount": 22,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "盛",
+      "id": "1131",
+      "dir": "1131",
+      "fileCount": 6,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "盥",
+      "id": "1137",
+      "dir": "1137",
+      "fileCount": 17,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "眚",
+      "id": "1147",
+      "dir": "1147",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "眣",
+      "id": "1150",
+      "dir": "1150",
+      "fileCount": 10,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "眴",
+      "id": "1151",
+      "dir": "1151",
+      "fileCount": 25,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "瞚",
+      "id": "1153",
+      "dir": "1153",
+      "fileCount": 6,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "矤",
+      "id": "1156",
+      "dir": "1156",
+      "fileCount": 6,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "矦",
+      "id": "0162",
+      "dir": "0161_0162",
+      "fileCount": 25,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "砅",
+      "id": "1158",
+      "dir": "1158",
+      "fileCount": 38,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "砍",
+      "id": "0762",
+      "dir": "0761_0762",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "祁",
+      "id": "1165",
+      "dir": "1165",
+      "fileCount": 11,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "祊",
+      "id": "1168",
+      "dir": "1168",
+      "fileCount": 23,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "祟",
+      "id": "1175",
+      "dir": "1175",
+      "fileCount": 11,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "祡",
+      "id": "1177",
+      "dir": "1177",
+      "fileCount": 18,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "福",
+      "id": "1182",
+      "dir": "1182",
+      "fileCount": 246,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "禘",
+      "id": "1183",
+      "dir": "1183",
+      "fileCount": 36,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "秜",
+      "id": "1189",
+      "dir": "1189",
+      "fileCount": 26,
+      "sources": [
+        "G",
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "秝",
+      "id": "1190",
+      "dir": "1190",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "稷",
+      "id": "1195",
+      "dir": "1195",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "稻",
+      "id": "1196",
+      "dir": "1196",
+      "fileCount": 12,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "穅",
+      "id": "0631",
+      "dir": "0630_0631",
+      "fileCount": 8,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "穫",
+      "id": "1201",
+      "dir": "1201",
+      "fileCount": 40,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "窺",
+      "id": "1203",
+      "dir": "1203",
+      "fileCount": 4,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "箕",
+      "id": "0206",
+      "dir": "0205_0206",
+      "fileCount": 48,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "粟",
+      "id": "1218",
+      "dir": "1218",
+      "fileCount": 5,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "糿",
+      "id": "1224",
+      "dir": "1224",
+      "fileCount": 21,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "紊",
+      "id": "1225",
+      "dir": "1225",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "索",
+      "id": "1226",
+      "dir": "1226",
+      "fileCount": 16,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "紳",
+      "id": "1228",
+      "dir": "1228",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "紹",
+      "id": "1230",
+      "dir": "1230",
+      "fileCount": 8,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "絶",
+      "id": "1234",
+      "dir": "1234",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "綏",
+      "id": "0462",
+      "dir": "0461_0462",
+      "fileCount": 9,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "縣",
+      "id": "1236",
+      "dir": "1236",
+      "fileCount": 10,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "縯",
+      "id": "1237",
+      "dir": "1237",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "繆",
+      "id": "1238",
+      "dir": "1238",
+      "fileCount": 18,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "續",
+      "id": "1239",
+      "dir": "1239_1240",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "羋",
+      "id": "1251",
+      "dir": "1251",
+      "fileCount": 29,
+      "sources": [
+        "G",
+        "H",
+        "L",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "羍",
+      "id": "0013",
+      "dir": "0011_0012_0013",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "羔",
+      "id": "1254",
+      "dir": "1254",
+      "fileCount": 4,
+      "sources": [
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "羖",
+      "id": "1255",
+      "dir": "1255",
+      "fileCount": 5,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "羲",
+      "id": "1258",
+      "dir": "1258",
+      "fileCount": 23,
+      "sources": [
+        "G",
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "翣",
+      "id": "1266",
+      "dir": "1266",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "考",
+      "id": "1269",
+      "dir": "1269",
+      "fileCount": 11,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "者",
+      "id": "1270",
+      "dir": "1270",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "而",
+      "id": "1273",
+      "dir": "1273",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "聖",
+      "id": "1286",
+      "dir": "1284_1285_1286",
+      "fileCount": 9,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "聮",
+      "id": "1281",
+      "dir": "1280_1281",
+      "fileCount": 8,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "聼",
+      "id": "1285",
+      "dir": "1284_1285_1286",
+      "fileCount": 23,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "肁",
+      "id": "1292",
+      "dir": "1290_1291_1292",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "肈",
+      "id": "1291",
+      "dir": "1290_1291_1292",
+      "fileCount": 32,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "能",
+      "id": "1297",
+      "dir": "1297",
+      "fileCount": 4,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "胾",
+      "id": "1298",
+      "dir": "1298",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "脊",
+      "id": "1299",
+      "dir": "1299",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "膳",
+      "id": "1416",
+      "dir": "1415_1416",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "臀",
+      "id": "1304",
+      "dir": "1304_1305",
+      "fileCount": 15,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "臽",
+      "id": "1316",
+      "dir": "1316",
+      "fileCount": 8,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "舍",
+      "id": "1323",
+      "dir": "1323",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "航",
+      "id": "1327",
+      "dir": "1327_1328",
+      "fileCount": 8,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "色",
+      "id": "1332",
+      "dir": "1332",
+      "fileCount": 7,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "艾",
+      "id": "1334",
+      "dir": "1334",
+      "fileCount": 3,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "芒",
+      "id": "1336",
+      "dir": "1336",
+      "fileCount": 4,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "華",
+      "id": "1352",
+      "dir": "1352",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "蕘",
+      "id": "1361",
+      "dir": "1361",
+      "fileCount": 4,
+      "sources": [
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "薶",
+      "id": "1364",
+      "dir": "1364",
+      "fileCount": 10,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "虒",
+      "id": "1368",
+      "dir": "1368",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "虢",
+      "id": "1370",
+      "dir": "1370",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "蚩",
+      "id": "1376",
+      "dir": "1376",
+      "fileCount": 14,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "血",
+      "id": "1384",
+      "dir": "1384",
+      "fileCount": 83,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "衍",
+      "id": "1386",
+      "dir": "1386",
+      "fileCount": 10,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "褘",
+      "id": "1394",
+      "dir": "1394",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "要",
+      "id": "1398",
+      "dir": "1398",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "觵",
+      "id": "1405",
+      "dir": "1405",
+      "fileCount": 6,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "訶",
+      "id": "1411",
+      "dir": "1411",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "譚",
+      "id": "1414",
+      "dir": "1414",
+      "fileCount": 8,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "譱",
+      "id": "1415",
+      "dir": "1415_1416",
+      "fileCount": 36,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "证",
+      "id": "1418",
+      "dir": "1418",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "豊",
+      "id": "1422",
+      "dir": "1421_1422",
+      "fileCount": 52,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "豢",
+      "id": "1427",
+      "dir": "1427",
+      "fileCount": 30,
+      "sources": [
+        "H",
+        "L",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "豩",
+      "id": "1428",
+      "dir": "1428",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "豶",
+      "id": "1433",
+      "dir": "1433",
+      "fileCount": 5,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "貔",
+      "id": "1436",
+      "dir": "1436",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "貣",
+      "id": "1439",
+      "dir": "1439",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "貴",
+      "id": "1443",
+      "dir": "1443",
+      "fileCount": 20,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "賜",
+      "id": "1448",
+      "dir": "1448",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "賡",
+      "id": "1240",
+      "dir": "1239_1240",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "足",
+      "id": "1103",
+      "dir": "1102_1103",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "跽",
+      "id": "1451",
+      "dir": "1451",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "踰",
+      "id": "1453",
+      "dir": "1453",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "达",
+      "id": "1468",
+      "dir": "1468",
+      "fileCount": 32,
+      "sources": [
+        "G",
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "迁",
+      "id": "1469",
+      "dir": "1469",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "逋",
+      "id": "1475",
+      "dir": "1475",
+      "fileCount": 16,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "進",
+      "id": "1481",
+      "dir": "1481",
+      "fileCount": 9,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "逴",
+      "id": "1482",
+      "dir": "1482",
+      "fileCount": 24,
+      "sources": [
+        "G",
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "避",
+      "id": "1491",
+      "dir": "1491",
+      "fileCount": 6,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鄙",
+      "id": "0361",
+      "dir": "0360_0361",
+      "fileCount": 2,
+      "sources": [
+        "G"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "釋",
+      "id": "1510",
+      "dir": "1510",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "釐",
+      "id": "1513",
+      "dir": "1513",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "金",
+      "id": "1514",
+      "dir": "1514",
+      "fileCount": 8,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鏑",
+      "id": "1516",
+      "dir": "1516",
+      "fileCount": 4,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "隓",
+      "id": "1541",
+      "dir": "1541_1542",
+      "fileCount": 7,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "隴",
+      "id": "1543",
+      "dir": "1543",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "雂",
+      "id": "1548",
+      "dir": "1548",
+      "fileCount": 6,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "雛",
+      "id": "1557",
+      "dir": "1557",
+      "fileCount": 9,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "離",
+      "id": "1559",
+      "dir": "1559",
+      "fileCount": 18,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "霧",
+      "id": "1535",
+      "dir": "1533_1534_1535",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "靁",
+      "id": "1567",
+      "dir": "1566_1567",
+      "fileCount": 29,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "靃",
+      "id": "1572",
+      "dir": "1571_1572",
+      "fileCount": 19,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鞭",
+      "id": "1581",
+      "dir": "1581",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "音",
+      "id": "1407",
+      "dir": "1406_1407",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "騂",
+      "id": "1605",
+      "dir": "1605_1606",
+      "fileCount": 23,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "騎",
+      "id": "1607",
+      "dir": "1607",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "驅",
+      "id": "1610",
+      "dir": "1610",
+      "fileCount": 26,
+      "sources": [
+        "H",
+        "X",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "驟",
+      "id": "1612",
+      "dir": "1612",
+      "fileCount": 38,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鬰",
+      "id": "1624",
+      "dir": "1623_1624",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鳖",
+      "id": "1633",
+      "dir": "1633",
+      "fileCount": 23,
+      "sources": [
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鳬",
+      "id": "1636",
+      "dir": "1635_1636",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鳯",
+      "id": "1591",
+      "dir": "1589_1590_1591",
+      "fileCount": 102,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鷸",
+      "id": "1645",
+      "dir": "1645",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鷹",
+      "id": "1646",
+      "dir": "1646",
+      "fileCount": 4,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "麛",
+      "id": "1653",
+      "dir": "1652_1653",
+      "fileCount": 13,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "麤",
+      "id": "1656",
+      "dir": "1656",
+      "fileCount": 7,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "黿",
+      "id": "1664",
+      "dir": "1664",
+      "fileCount": 25,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "鼖",
+      "id": "1669",
+      "dir": "1669",
+      "fileCount": 2,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "龏",
+      "id": "1676",
+      "dir": "1676",
+      "fileCount": 35,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠂇",
+      "id": "1687",
+      "dir": "1687_1688",
+      "fileCount": 52,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠂔",
+      "id": "1689",
+      "dir": "1689",
+      "fileCount": 16,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠂤",
+      "id": "1690",
+      "dir": "1690",
+      "fileCount": 77,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠂹",
+      "id": "0397",
+      "dir": "0396_0397",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠎀",
+      "id": "1691",
+      "dir": "1691",
+      "fileCount": 9,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠑹",
+      "id": "1692",
+      "dir": "1692",
+      "fileCount": 23,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠓆",
+      "id": "1693",
+      "dir": "1693",
+      "fileCount": 5,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠔁",
+      "id": "1694",
+      "dir": "1694",
+      "fileCount": 9,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠣬",
+      "id": "1695",
+      "dir": "1695",
+      "fileCount": 16,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠤗",
+      "id": "1107",
+      "dir": "1106_1107",
+      "fileCount": 31,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠦃",
+      "id": "0271",
+      "dir": "0270_0271",
+      "fileCount": 6,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠦪",
+      "id": "1696",
+      "dir": "1696",
+      "fileCount": 120,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠧙",
+      "id": "1697",
+      "dir": "1697",
+      "fileCount": 3,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠧟",
+      "id": "1472",
+      "dir": "1471_1472",
+      "fileCount": 1,
+      "sources": [
+        "G"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠧪",
+      "id": "0282",
+      "dir": "0281_0282_0283",
+      "fileCount": 11,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠧴",
+      "id": "0283",
+      "dir": "0281_0282_0283",
+      "fileCount": 11,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠨘",
+      "id": "1699",
+      "dir": "1699",
+      "fileCount": 32,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠬝",
+      "id": "1700",
+      "dir": "1700",
+      "fileCount": 62,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠬞",
+      "id": "0639",
+      "dir": "0638_0639",
+      "fileCount": 20,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠭖",
+      "id": "0751",
+      "dir": "0750_0751",
+      "fileCount": 39,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠭥",
+      "id": "1701",
+      "dir": "1701",
+      "fileCount": 22,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠭯",
+      "id": "1702",
+      "dir": "1702",
+      "fileCount": 32,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠭰",
+      "id": "1703",
+      "dir": "1703",
+      "fileCount": 69,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠯑",
+      "id": "1704",
+      "dir": "1704",
+      "fileCount": 30,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠱫",
+      "id": "1705",
+      "dir": "1705_1706",
+      "fileCount": 16,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𠷓",
+      "id": "1707",
+      "dir": "1707",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡈼",
+      "id": "1708",
+      "dir": "1708",
+      "fileCount": 25,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡊎",
+      "id": "0395",
+      "dir": "0394_0395",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡎐",
+      "id": "1710",
+      "dir": "1710",
+      "fileCount": 12,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡖊",
+      "id": "0422",
+      "dir": "0421_0422",
+      "fileCount": 68,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡚤",
+      "id": "1711",
+      "dir": "1711",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡚽",
+      "id": "0459",
+      "dir": "0458_0459",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡜊",
+      "id": "1712",
+      "dir": "1712",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡜍",
+      "id": "1713",
+      "dir": "1713",
+      "fileCount": 21,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡪢",
+      "id": "0559",
+      "dir": "0558_0559_0560",
+      "fileCount": 22,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡫳",
+      "id": "0408",
+      "dir": "0407_0408",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡱂",
+      "id": "1305",
+      "dir": "1304_1305",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡴘",
+      "id": "1714",
+      "dir": "1714",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡿧",
+      "id": "1009",
+      "dir": "1008_1009",
+      "fileCount": 63,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𡿪",
+      "id": "1715",
+      "dir": "1715",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢅜",
+      "id": "1716",
+      "dir": "1716",
+      "fileCount": 19,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢌳",
+      "id": "1717",
+      "dir": "1717",
+      "fileCount": 11,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢍣",
+      "id": "1718",
+      "dir": "1718",
+      "fileCount": 4,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢍪",
+      "id": "1719",
+      "dir": "1719",
+      "fileCount": 50,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢏂",
+      "id": "1720",
+      "dir": "1720",
+      "fileCount": 22,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢑏",
+      "id": "0288",
+      "dir": "0286_0287_0288",
+      "fileCount": 9,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢑩",
+      "id": "1721",
+      "dir": "1721",
+      "fileCount": 8,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢓴",
+      "id": "1722",
+      "dir": "1722",
+      "fileCount": 20,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢦏",
+      "id": "1723",
+      "dir": "1723_1724_1725",
+      "fileCount": 53,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢦒",
+      "id": "1725",
+      "dir": "1723_1724_1725",
+      "fileCount": 23,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢦔",
+      "id": "1724",
+      "dir": "1723_1724_1725",
+      "fileCount": 13,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢦚",
+      "id": "1726",
+      "dir": "1726",
+      "fileCount": 49,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢧵",
+      "id": "0716",
+      "dir": "0715_0716",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢪇",
+      "id": "0570",
+      "dir": "0569_0570",
+      "fileCount": 13,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢻫",
+      "id": "1727",
+      "dir": "1727_1728",
+      "fileCount": 18,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢼸",
+      "id": "1729",
+      "dir": "1729",
+      "fileCount": 8,
+      "sources": [
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𢿱",
+      "id": "1730",
+      "dir": "1730",
+      "fileCount": 22,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣆑",
+      "id": "1731",
+      "dir": "1731",
+      "fileCount": 40,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣍘",
+      "id": "0808",
+      "dir": "0807_0808",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣎆",
+      "id": "1757",
+      "dir": "1756_1757",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣎳",
+      "id": "1732",
+      "dir": "1732",
+      "fileCount": 16,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣐺",
+      "id": "1733",
+      "dir": "1733",
+      "fileCount": 20,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣡌",
+      "id": "1734",
+      "dir": "1734",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣪌",
+      "id": "1735",
+      "dir": "1735",
+      "fileCount": 15,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣪕",
+      "id": "1736",
+      "dir": "1736_1737_1738",
+      "fileCount": 32,
+      "sources": [
+        "G",
+        "H",
+        "Y"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣪘",
+      "id": "1737",
+      "dir": "1736_1737_1738",
+      "fileCount": 12,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣬕",
+      "id": "1739",
+      "dir": "1739",
+      "fileCount": 30,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣹢",
+      "id": "0969",
+      "dir": "0968_0969",
+      "fileCount": 7,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𣻐",
+      "id": "1740",
+      "dir": "1740",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𤉡",
+      "id": "0194",
+      "dir": "0193_0194",
+      "fileCount": 32,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𤓪",
+      "id": "1741",
+      "dir": "1741",
+      "fileCount": 6,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𤔔",
+      "id": "0114",
+      "dir": "0113_0114",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𤰇",
+      "id": "1742",
+      "dir": "1742",
+      "fileCount": 17,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𤴨",
+      "id": "1743",
+      "dir": "1743",
+      "fileCount": 31,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𤼷",
+      "id": "1116",
+      "dir": "1115_1116",
+      "fileCount": 12,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𤾕",
+      "id": "0812",
+      "dir": "0811_0812",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥁑",
+      "id": "1744",
+      "dir": "1744",
+      "fileCount": 30,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥁕",
+      "id": "0789",
+      "dir": "0787_0788_0789",
+      "fileCount": 72,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥁰",
+      "id": "1134",
+      "dir": "1133_1134",
+      "fileCount": 14,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥄎",
+      "id": "1745",
+      "dir": "1745",
+      "fileCount": 8,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥆞",
+      "id": "1746",
+      "dir": "1746",
+      "fileCount": 4,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥇛",
+      "id": "0446",
+      "dir": "0445_0446",
+      "fileCount": 27,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥉁",
+      "id": "1747",
+      "dir": "1747",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥏫",
+      "id": "1748",
+      "dir": "1748",
+      "fileCount": 6,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥞥",
+      "id": "1750",
+      "dir": "1750",
+      "fileCount": 18,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥣇",
+      "id": "1751",
+      "dir": "1751",
+      "fileCount": 3,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥩮",
+      "id": "1706",
+      "dir": "1705_1706",
+      "fileCount": 10,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥷚",
+      "id": "1752",
+      "dir": "1752",
+      "fileCount": 13,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𥿆",
+      "id": "1753",
+      "dir": "1753",
+      "fileCount": 8,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𦄑",
+      "id": "1754",
+      "dir": "1754",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𦊽",
+      "id": "1755",
+      "dir": "1755",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𦎫",
+      "id": "1780",
+      "dir": "1779_1780",
+      "fileCount": 51,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𦏧",
+      "id": "0517",
+      "dir": "0516_0517",
+      "fileCount": 10,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𦟀",
+      "id": "1756",
+      "dir": "1756_1757",
+      "fileCount": 25,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𦩻",
+      "id": "0828",
+      "dir": "0827_0828",
+      "fileCount": 5,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𦬕",
+      "id": "1758",
+      "dir": "1758",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𧇄",
+      "id": "1759",
+      "dir": "1759",
+      "fileCount": 3,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𧖧",
+      "id": "1760",
+      "dir": "1760",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𧗿",
+      "id": "1761",
+      "dir": "1761",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𧯦",
+      "id": "1762",
+      "dir": "1762",
+      "fileCount": 14,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𧻚",
+      "id": "1763",
+      "dir": "1763",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𨑒",
+      "id": "0671",
+      "dir": "0670_0671",
+      "fileCount": 16,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𨑭",
+      "id": "1764",
+      "dir": "1764",
+      "fileCount": 1,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𨖹",
+      "id": "1765",
+      "dir": "1765",
+      "fileCount": 13,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𨪐",
+      "id": "1766",
+      "dir": "1766",
+      "fileCount": 5,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𨸏",
+      "id": "1526",
+      "dir": "1525_1526",
+      "fileCount": 12,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𨾊",
+      "id": "1640",
+      "dir": "1639_1640_1641",
+      "fileCount": 7,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𩁹",
+      "id": "1563",
+      "dir": "1562_1563",
+      "fileCount": 20,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𩂣",
+      "id": "1767",
+      "dir": "1767",
+      "fileCount": 4,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𩏏",
+      "id": "1768",
+      "dir": "1768",
+      "fileCount": 25,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𩛥",
+      "id": "1770",
+      "dir": "1770",
+      "fileCount": 97,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𩢯",
+      "id": "1771",
+      "dir": "1771",
+      "fileCount": 1,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𩥍",
+      "id": "1606",
+      "dir": "1605_1606",
+      "fileCount": 21,
+      "sources": [
+        "G",
+        "L",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𩫏",
+      "id": "0410",
+      "dir": "0409_0410",
+      "fileCount": 70,
+      "sources": [
+        "G",
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𩫚",
+      "id": "1430",
+      "dir": "1429_1430",
+      "fileCount": 2,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𩰱",
+      "id": "1772",
+      "dir": "1772",
+      "fileCount": 10,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𪀝",
+      "id": "1774",
+      "dir": "1774",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𪋧",
+      "id": "1775",
+      "dir": "1775",
+      "fileCount": 3,
+      "sources": [
+        "G",
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𪷾",
+      "id": "1776",
+      "dir": "1776",
+      "fileCount": 11,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𫡜",
+      "id": "1777",
+      "dir": "1777",
+      "fileCount": 16,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𫻪",
+      "id": "1778",
+      "dir": "1778",
+      "fileCount": 2,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𬙸",
+      "id": "1779",
+      "dir": "1779_1780",
+      "fileCount": 27,
+      "sources": [
+        "X"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𬟏",
+      "id": "1684",
+      "dir": "1682_1683_1684",
+      "fileCount": 18,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𰉏",
+      "id": "0383",
+      "dir": "0382_0383",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    },
+    {
+      "char": "𰦖",
+      "id": "1781",
+      "dir": "1781",
+      "fileCount": 3,
+      "sources": [
+        "L"
+      ],
+      "class": "image-candidate",
+      "aliasTarget": null,
+      "aliasVia": null
+    }
+  ]
+}

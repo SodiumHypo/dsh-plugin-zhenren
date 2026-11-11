@@ -2,7 +2,7 @@
  * Single-character query contract (CLAUDE.md §3.5).
  *
  * Fixed order, no exceptions:
- *   1. input is itself one of the 1,425 glyphs  → matchedBy: 'glyph'
+ *   1. input is itself a corpus glyph           → matchedBy: 'glyph'
  *   2. input is an alias key                    → matchedBy: 'alias'
  *   3. otherwise                                → found: false
  *
@@ -65,7 +65,13 @@ function toFound(
   const headword = record.headword
   const headwordRecord = headword === null ? undefined : index.headwords.get(headword)
   const shuowen = headwordRecord === undefined ? null : headwordRecord.shuowen
-  const sources: SourceRef[] = [{ kind: 'oracleGlyph', value: 'Oracular (yigezi)' }]
+  // D17: the glyph source names the rendering branch and its provenance.
+  const glyphSource = record.source
+  const glyphOrigin =
+    glyphSource === 'image' && record.image !== undefined
+      ? `HUST-OBC (${record.image.source}, arXiv 2401.15365)`
+      : 'Oracular (yigezi)'
+  const sources: SourceRef[] = [{ kind: 'oracleGlyph', value: glyphOrigin }]
   if (shuowen !== null && headwordRecord !== undefined) {
     sources.push({ kind: 'shuowen', value: headwordRecord.sources.shuowen })
   }
@@ -77,6 +83,7 @@ function toFound(
     query,
     normalized: glyphChar,
     glyphChar,
+    glyphSource,
     headword,
     shuowen,
     matchedBy,

@@ -3,7 +3,9 @@
  *
  * Registers the two ritual tools and the 贞人 protocol section. The corpus is
  * loaded lazily on the first tool call, so a broken `data/oracle.json` becomes a
- * `data-unavailable` tool error instead of a plugin that fails to load.
+ * `data-unavailable` tool error instead of a plugin that fails to load. The
+ * protocol section makes one best-effort load for the live corpus size and
+ * tolerates failure the same way.
  */
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-tools'
@@ -12,7 +14,7 @@ import type {} from '@deepseek-ai/dsh-system-prompt'
 import type { Config } from './config.js'
 import { resolveConfig } from './config.js'
 import { loadOracleIndex, type OracleIndex } from './data/load.js'
-import { PROMPT_SECTION_NAME, PROMPT_TEXT, promptSectionOrder } from './prompt.js'
+import { PROMPT_SECTION_NAME, promptSectionOrder, promptText } from './prompt.js'
 import { createBurnTool } from './tools/burn.js'
 import { createInscribeTool } from './tools/inscribe.js'
 import { createDivinationMemory } from './tools/shared.js'
@@ -45,9 +47,19 @@ export function apply(ctx: Context, config: Config = {}): void {
 
   ctx.tools.register(createBurnTool({ getIndex, config: resolved, memory }))
   ctx.tools.register(createInscribeTool({ getIndex, config: resolved, memory }))
+
+  // The protocol quotes the live corpus size (D17). This load is best-effort:
+  // a broken data file must not fail the plugin, so fall back to the count-free
+  // text and let the first tool call surface `data-unavailable` instead.
+  let supportedCount: number | undefined
+  try {
+    supportedCount = getIndex().supportedCount
+  } catch {
+    supportedCount = undefined
+  }
   ctx.systemPrompt.section({
     name: PROMPT_SECTION_NAME,
     order: promptSectionOrder(ctx),
-    text: PROMPT_TEXT,
+    text: promptText(supportedCount),
   })
 }

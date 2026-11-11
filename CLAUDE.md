@@ -2,7 +2,7 @@
 
 > 本文件是「甲骨贞人」插件项目的长期架构上下文，不是执行计划。
 > 后续会话在动手前先读第 1–4 节；第 7 节记录已经做出的取舍，除非出现新事实，不要重新发明。
-> 事实基线：2026-11-10，基于 `.refs/yigezi-main` 与 `.refs/deepseek-harness-master` 的当前快照。
+> 事实基线：2026-11-11，基于 `.refs/yigezi-main`、`.refs/deepseek-harness-master` 与 `.refs/HUST-OBC` 的当前快照。
 
 ---
 
@@ -29,7 +29,7 @@
 ### 1.3 设计原则
 
 1. **物质优先**：每一次回答都必须留下一个可见的物件——龟甲、裂纹、刻痕、卜辞。不能退化成“一段带古风的话”。
-2. **不伪造**：字形只来自 1,425 字库；释义只来自《说文》数据；没有的字返回 `found: false`，没有的释义返回 `shuowen: null`；绝不合成字形，绝不编造说文引文。
+2. **不伪造**：字形只来自随包字形库（Oracular 字体 1,425 字 + HUST-OBC 精选图像字形，见 D17）；释义只来自《说文》数据；没有的字返回 `found: false`，没有的释义返回 `shuowen: null`；绝不合成字形，绝不编造说文引文。
 3. **单一兆象**：一次占卜只有一个权威 `auspice`。裂纹、占辞、卡片标签、现代解读都从它派生；模型不得在文字里改写兆象。
 4. **会话即档案**：工具调用与结果就是持久记录；`presentationMeta` 就是动画句柄。不预设数据库，不依赖进程内状态才能重放。
 5. **不阻塞**：动画是装饰层，不是事实层。host 立即返回结果，client 自己播；即使 client 崩溃、字体加载失败或用户关闭动画，对话仍然可读、可用。
@@ -39,7 +39,7 @@
 ### 1.4 非目标
 
 - 不是真实的占卜服务，不宣称超自然效力，不替代用户的判断。
-- 不是甲骨学数据库或完整字编；当前只覆盖 1,425 个有甲骨字形的字。
+- 不是甲骨学数据库或完整字编；当前覆盖 Oracular 字体 1,425 字加 HUST-OBC 精选图像字形（首批约 200 字，见 D17），仍是封闭字库。
 - 不是《说文》全译或汉语词源百科；白话转述是辅助阅读，不是学术定论。
 - 不是通用 Canvas/动画框架；只服务这一套仪式。
 - 不做数据库、不做服务端渲染、不做运行时爬取、不做遥测。
@@ -223,12 +223,25 @@ yigezi 的 `lookup(raw)` 大致行为：
 | OpenCC | Apache-2.0 | 构建期使用；若分发 s2t 表需带声明 |
 | PHONO-ML | CC BY 4.0 | `mc`/`pos`/`oc` 等音韵字段，当前排除 |
 | 广韵形声考 | 无明确开源许可 | 当前排除 |
+| HUST-OBC 已释字图像 | 古文字字形公有领域 | 见 D17；保留 HUST-OBC 与原始出处署名，不随包分发全量图库 |
+
+#### 2.2.6 HUST-OBC 数据集（D17 字形素材）
+
+`.refs/HUST-OBC/HUST-OBC/deciphered/` 是已释字图像集（arXiv 2401.15365）。事实基线（2026-11-11 实测）：
+
+- `ID_to_chinese.json` / `chinese_to_ID.json`：1,781 个唯一已释字，ID↔单字一一对应。
+- 目录 1,588 个；其中 173 个是合并目录（如 `0011_0012_0013`、`1231_1232`），**每个成员 ID 有自己的子目录**存放图像；单 ID 目录的图像直接放在目录根。
+- 图像共 65,758 张：53,788 张 PNG + 11,970 张 JPG。**L 源（甲骨文字六位数字编码）是 JPG，其余源是 PNG**。只扫顶层 PNG 会漏掉合并目录与 L 源。
+- 文件名模式 `<源>_<ID>_<著录>.png|jpg`。源代码：`X`=《新甲骨文编》、`G`=国学大师、`Y`=殷契文渊、`H`=HWOBC、`L`=六位数字编码。`G` 源著录常含 `合<合集号><组类>`（如 `後2.36.5合33075𠂤歷間`），也有无著录的 `甲骨文N` 通用图；`X`/`H`/`L` 源著录是编号，无合集号/组类。
+- 图像为**浅底深墨**（拓片/照片扫描，实测 40 张抽样 38 张浅底），归一化时一般无需反色；个别深底需按边界/中心灰度判极性。
+- 尺寸 26×80 到 295×215；L 源 JPG 偏小（约 35×59），其余源较大。
+- 覆盖审计：1,781 已释字中 1,297 字已被库内字形或别名覆盖，**484 字在库外**；这 484 字全部无法经 OpenCC/TS 归一到现有字形（即都是图像字形候选，不是别名候选）。审计脚本 `scripts/expand-hust/audit.mjs` 产出 `candidates.json`。
 
 ### 2.3 事实对架构的强制约束
 
 1. **主键不能只是现代繁体字**：说文头是朙、亾、㠯、秊、宐、亏这类形体；必须有“说文头 + 别名层 + 甲骨字形码位”三件套。
-2. **1,425 是字形边界，不是释义边界**：所有 1,425 字都有字形；只有 1,196 字能自动接上《说文》，加人工裁定后随包数据为 1,202。`found` 与 `shuowen` 必须分开表达。
-3. **字体可以直接用**：Canvas 的 `fillText` 加载 `orac.woff2` 即可，不需要在构建期抽取 1,425 条 SVG path；这避免重复字形数据，也避免修改字体。
+2. **字形库边界是字形边界，不是释义边界**：字体 1,425 字都有字形；只有 1,196 字能自动接上《说文》，加人工裁定后为 1,202。D17 扩容后字形库为 `1,425 + 图像字数`，边界随 `glyphs.size` 动态取值。`found` 与 `shuowen` 必须分开表达。
+3. **字体可以直接用**：Canvas 的 `fillText` 加载 `orac.woff2` 即可，不需要在构建期抽取 1,425 条 SVG path；这避免重复字形数据，也避免修改字体。图像字形（D17）走独立的 `GlyphSource` 图片分支，不改动字体。
 4. **内联卡片只能走 `tool.call.toolview`**：`presentCall`/`presentResult` 的固定词汇无法承载仪式；HTML preview 在侧栏，不是会话流。
 5. **host 不应依赖未确认的会话存储 API**：当前没有文档化的数据库；会话日志与 `presentationMeta` 已足够做持久化与重放。
 
@@ -265,32 +278,34 @@ yigezi 的 `lookup(raw)` 大致行为：
    5. yigezi `TS[c]` 的候选逐个命中 `SW`；
    6. 都没有 → `headword = null`，记作 glyph-only。
 5. **附加古文字纠正**：用 `XZ` 的键（为、射、行、出、各、止、得、家、昔、明）去匹配记录。匹配顺序：甲骨字本身 → 字头 → 别名集合。命中则写入对应 `headword` 记录的 `shuowen.correction`，来源标为 `yigezi:XZ`。
-6. **生成字形记录**：每个 `glyphChar` 一条，写入 `headword`（可为 `null`）与 `resolvedBy`。`glyphChar` 必须是 1,425 字之一。
-7. **生成字头记录**：每个唯一 `headword` 一条，写入 `shuowen`、`pinyin`、`radical`、反向 `glyphChars`。1,202 个可释义字形（1,196 自动 + 6 人工）归并为 1,181 个 `headword`。
-8. **生成别名索引**：把没有独立字形的输入形式映射到 `glyphChar`：
-   - `SW` 字头本身（当它不是 1,425 字形之一时，如 `亾`、`䠶`）；
+6. **生成字形记录**：每个 `glyphChar` 一条，写入 `headword`（可为 `null`）、`resolvedBy` 与 `source`。字体字形 `source: "font"`，`glyphChar` 必须是 1,425 字之一；图像字形（D17）`source: "image"`，来自 `data/hust-glyphs.json`（由 `scripts/expand-hust/build-images.py` 产出），并携带 `image` 出处元数据。图像字形的字头解析复用同一优先级链。
+7. **生成字头记录**：每个唯一 `headword` 一条，写入 `shuowen`、`pinyin`、`radical`、反向 `glyphChars`。字体层 1,202 个可释义字形归并为 1,181 个 `headword`；图像字形接入的字头并入同一张表。
+8. **合并白话转述**（D18）：读取 `data/vernacular-overrides.json`，把人工/批量草稿按 `headword` 合并进 `headwords[*].shuowen.vernacular`，全部标 `vernacularStatus: "draft"`。该文件是人工产物，重抽取不得覆盖；未命中的字头 `vernacular` 保持空串。
+9. **生成别名索引**：把没有独立字形的输入形式映射到 `glyphChar`：
+   - `SW` 字头本身（当它不是字形之一时，如 `亾`、`䠶`）；
    - `TS` 中指向该字形的简体/异体；
    - OpenCC s2t 的简体形式；
    - 反向 `w` 的重文；
    - 人工别名（`kind: "alias"`）。
-   - 键必须与 1,425 字形集合不相交；输入本身有字形时，运行期直接命中，不进别名表。
-9. **写文件**：`oracle.json`、`manifest.json`、`extraction-report.json`；如果人工别名表不存在，创建一个空表，不覆盖已有内容。
-10. **构建期不变量检查**：
-    - `glyphs` 恰好 1,425 条，键集合与字体 cmap 集合一致；
+   - 键必须与字形集合（字体 + 图像）不相交；输入本身有字形时，运行期直接命中，不进别名表。
+10. **写文件**：`oracle.json`、`manifest.json`、`extraction-report.json`；如果人工别名表/转述表不存在，创建空表，不覆盖已有内容。
+11. **构建期不变量检查**：
+    - 字体字形恰好 1,425 条，键集合与字体 cmap 集合一致；`glyphs` 总数 = 1,425 + 图像字数；
+    - 每个 `source: "image"` 字形必须有 `image` 出处，且对应 PNG 文件存在；图像字形键不与字体 cmap 重叠；
     - `headwords` 恰为 `glyphs` 中非空 `headword` 的去重集合；每个 `headword` 至少被一个字形引用；
     - 每个 `glyphs[*].headword` 要么为 `null`，要么存在于 `headwords`；
     - 每条 `headwords[*].shuowen.original` 非空；
-    - `aliases` 的键不与 1,425 字形集合重叠，值必须是存在的 `glyphChar`；
+    - `aliases` 的键不与字形集合重叠，值必须是存在的 `glyphChar`；
     - 被排除的音韵字段没有进入生成物。
-10. **复制字体**：原样复制 `orac.woff2`，同时复制 OFL 文本；不修改字体二进制。
+12. **复制字体**：原样复制 `orac.woff2`，同时复制 OFL 文本；不修改字体二进制。
 
 ### 3.3 主键与两层记录
 
 数据层不是一个扁平记录数组，而是两张表加一张索引：
 
-- `headwords`：以 `headword` 为主键，1,181 条；每条承载一份《说文》释义。
-- `glyphs`：以 `glyphChar` 为主键，1,425 条；每条指向一个 `headword`，或为 `null`。
-- `aliases`：输入形式 → `glyphChar` 的索引；构建期生成，键不与 1,425 字形集合重叠。
+- `headwords`：以 `headword` 为主键；每条承载一份《说文》释义。字体层 1,181 条，图像字形接入的字头并入。
+- `glyphs`：以 `glyphChar` 为主键；每条指向一个 `headword`（或 `null`），并带 `source`（`font`/`image`）。字体层 1,425 条，加 D17 图像字形。
+- `aliases`：输入形式 → `glyphChar` 的索引；构建期生成，键不与字形集合（字体 + 图像）重叠。
 
 为什么必须分两层：
 
@@ -311,7 +326,7 @@ yigezi 的 `lookup(raw)` 大致行为：
 
 > **说文头是释义主键；字形是字形的独立主键；现代繁体、简体、异体、重文通过字形表与别名层落到具体 `glyphChar`。**
 
-`glyphChar` 始终是 1,425 字之一，用来索引 `orac.woff2`。它可能与所属 `headword` 不同：`明` 的字形记录指向 `headword = 朙`，但绘制时用 `glyphChar = 明`。
+`glyphChar` 是字形库的一员：`source: "font"` 时是 1,425 字之一，用来索引 `orac.woff2`；`source: "image"` 时（D17）用来索引随包 PNG。它可能与所属 `headword` 不同：`明` 的字形记录指向 `headword = 朙`，但绘制时用 `glyphChar = 明`。
 
 构建期与运行期的优先级是两套，不可混用：
 
@@ -345,15 +360,18 @@ exact glyph > alias > not found
 
 ```json
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-11-10",
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11",
   "source": {
     "yigezi": "snapshot path and hash",
     "shuowen": "shuowen.org via yigezi",
-    "font": "Oracular"
+    "font": "Oracular",
+    "images": "HUST-OBC deciphered (arXiv 2401.15365)"
   },
   "counts": {
-    "glyphs": 1425,
+    "glyphs": 1628,
+    "fontGlyphs": 1425,
+    "imageGlyphs": 203,
     "glossedGlyphs": 1202,
     "glyphOnly": 223,
     "headwords": 1181,
@@ -366,7 +384,9 @@ exact glyph > alias > not found
 }
 ```
 
-`counts` 是随包数据的实际计数。它与 2.2.4 的“自动解析”口径差 6 个字：`alias-overrides.json` 里带出处的 6 条 `kind: "headword"` 人工裁定（亡→亾、以→㠯、年→秊、春→萅、宜→宐、于→亏）把自动未匹配从 229 降到 223，释义字形从 1,196 升到 1,202，字头从 1,176 升到 1,181，共享字头从 20 升到 21。自动层的数字仍是审计基线，见 2.2.4 与 9A。
+`schemaVersion: 2`（D17）引入字形来源维度。`counts.glyphs = fontGlyphs + imageGlyphs`；`fontGlyphs` 恒为 1,425（字体 cmap），`imageGlyphs` 是 D17 精选图像字数。上例的 1,628 / 203 是首批扩容的示意值，实际以抽取产物为准。`glossedGlyphs`/`glyphOnly`/`headwords`/`sharedHeadwords`/`aliases` 随图像字形接入与人工裁定变化，运行时一律以 `glyphs.size` 等为权威，不硬编码。
+
+字体层的 `counts` 与 2.2.4 的“自动解析”口径差 6 个字：`alias-overrides.json` 里带出处的 6 条 `kind: "headword"` 人工裁定（亡→亾、以→㠯、年→秊、春→萅、宜→宐、于→亏）把自动未匹配从 229 降到 223，释义字形从 1,196 升到 1,202，字头从 1,176 升到 1,181，共享字头从 20 升到 21。自动层的数字仍是审计基线，见 2.2.4 与 9A。
 
 `headwords` 的键就是 `headword`；条目：
 
@@ -389,15 +409,30 @@ exact glyph > alias > not found
 }
 ```
 
-`glyphs` 的键就是 `glyphChar`；三个典型条目：
+`glyphs` 的键就是 `glyphChar`；典型条目（字体字形带 `source: "font"`，图像字形带 `source: "image"` 与 `image` 出处）：
 
 ```json
 {
-  "明": { "headword": "朙", "resolvedBy": "reverse-w" },
-  "朙": { "headword": "朙", "resolvedBy": "exact-sw" },
-  "其": { "headword": null, "resolvedBy": "none" }
+  "明": { "headword": "朙", "resolvedBy": "reverse-w", "source": "font" },
+  "朙": { "headword": "朙", "resolvedBy": "exact-sw", "source": "font" },
+  "其": { "headword": null, "resolvedBy": "none", "source": "font" },
+  "福": {
+    "headword": "福",
+    "resolvedBy": "exact-sw",
+    "source": "image",
+    "image": {
+      "file": "glyphs/798f.png",
+      "hustId": "1182",
+      "source": "国学大师",
+      "citation": "甲骨文",
+      "collection": null,
+      "group": null
+    }
+  }
 }
 ```
+
+`image` 字段（仅 `source: "image"`）：`file` 是相对 `data/` 的 PNG 路径；`hustId` 是 HUST-OBC 字 ID；`source` 是原始出处名（新甲骨文编/国学大师/殷契文渊/HWOBC/六位数字编码）；`citation` 是文件名里的著录原文；`collection`/`group` 是从著录解析出的合集号与组类，无则 `null`。
 
 带古文字纠正的字头：
 
@@ -438,10 +473,12 @@ exact glyph > alias > not found
 
 字段约定：
 
-- `glyphChar`：`glyphs` 的键；1,425 字之一；Canvas 用它来 `fillText`。
+- `glyphChar`：`glyphs` 的键；字形库的一员。`source: "font"` 时 Canvas 用它来 `fillText`；`source: "image"` 时用它索引随包 PNG。
 - `headword`：`headwords` 的键；说文头。字形记录里可为 `null`。
 - `headwords[*].glyphChars`：反向引用，只读派生；列出一个说文头对应的全部甲骨字形。
 - `glyphs[*].resolvedBy`：构建期解析路径，取 `manual-headword` / `exact-sw` / `reverse-w` / `opencc` / `ts` / `none`；审计用。
+- `glyphs[*].source`：`font` / `image`；决定渲染分支（D17）。
+- `glyphs[*].image`：仅 `source: "image"`；出处元数据，见上。
 - `aliases`：只用于把无字形输入归一到字形，不用于展示。
 - `shuowen.original`：逐字保留的《说文》原文；不删“凡……之屬皆从……”公式。
 - `shuowen.vernacular`：一句白话转述；是我们生成的辅助文本，不是 shuowen.org 原文；用 `vernacularStatus` 标记状态。
@@ -462,13 +499,14 @@ type OracleLookup =
       query: string
       normalized: string
       reason: 'not-in-oracle-corpus'
-      supportedCount: 1425
+      supportedCount: number // glyphs.size，字体 + 图像，动态
     }
   | {
       found: true
       query: string
       normalized: string
       glyphChar: string
+      glyphSource: 'font' | 'image'
       headword: string | null
       shuowen: ShuowenGloss | null
       matchedBy: 'glyph' | 'alias'
@@ -485,15 +523,15 @@ interface ShuowenGloss {
 
 查询顺序是固定三步：
 
-1. 输入归一化后若本身就是 1,425 字形之一 → 直接命中，`matchedBy: "glyph"`；
-2. 否则查 `aliases` → 命中则 `matchedBy: "alias"`；
+1. 输入归一化后若本身就是字形库（字体 + 图像）的一员 → 直接命中，`matchedBy: "glyph"`，并带回 `glyphSource`；
+2. 否则查 `aliases` → 命中则 `matchedBy: "alias"`，`glyphSource` 取目标字形的来源；
 3. 都没有 → `found: false`。
 
 语义必须严格区分：
 
 - **`found` 表示“有甲骨字形”**，不是“有《说文》释义”。
-- `found: true` + `headword: null` + `shuowen: null` 是合法结果，代表“这个字有甲骨字形，但构建期没接上《说文》”。当前有 229 个这样的字。
-- `found: false` 表示归一化后的输入不在 1,425 字库内。此时：
+- `found: true` + `headword: null` + `shuowen: null` 是合法结果，代表“这个字有甲骨字形，但构建期没接上《说文》”。字体层当前有 223 个这样的字。
+- `found: false` 表示归一化后的输入不在字形库内。此时：
   - 不返回最近的字；
   - 不返回拼音相似的字；
   - 不生成字形；
@@ -501,36 +539,40 @@ interface ShuowenGloss {
   - 只返回 `reason` 与 `supportedCount`，让模型改写或让用户换字。
 - 输入归一化：NFC、去空白、取单个 CJK 字；如果一个字符串包含多个字，由上层拆字后逐字查询，查询层本身只接受单字。
 - `normalized` 是查询最终落到的 `glyphChar`；`query` 是原始输入。模型和 UI 都要能看到两者的差异，避免“查的是简体、刻的是繁体”造成误解。`found: false` 时 `normalized` 只是清洗后的输入，不暗示存在近似字。
-- `found` 的判断发生在归一化之后：`贞` 本身不在 1,425 字库，但经 OpenCC/TS 归一为 `貞` 后命中，因此结果是 `found: true`，`glyphChar = 貞`。不能因为原字面不在字库就直接判 `found: false`。
+- `found` 的判断发生在归一化之后：`贞` 本身不在字形库，但经 OpenCC/TS 归一为 `貞` 后命中，因此结果是 `found: true`，`glyphChar = 貞`。不能因为原字面不在字库就直接判 `found: false`。
 
-**为什么不是 `found` 同时要求有释义**：如果要求两者都有，229 个有甲骨字形的常见字（亡、以、年、春、其、于等）会被判为“未找到”，用户就无法刻出这些字。这既不符合字形事实，也会让卜辞变得残缺。正确做法是分开表达：字形在，刻；释义缺，诚实地说“《说文》未收此形”。
+**为什么不是 `found` 同时要求有释义**：如果要求两者都有，223 个有甲骨字形的常见字（亡、以、年、春、其、于等）会被判为“未找到”，用户就无法刻出这些字。这既不符合字形事实，也会让卜辞变得残缺。正确做法是分开表达：字形在，刻；释义缺，诚实地说“《说文》未收此形”。
 
-### 3.6 1,425 边界的传播
+### 3.6 字形库边界的传播
 
-1,425 不是数据层的一个统计数字，而是贯穿所有层的硬边界。每一层都必须显式处理它。
+字形库边界（字体 1,425 + D17 图像字形）不是数据层的一个统计数字，而是贯穿所有层的硬边界。每一层都必须显式处理它；边界值随 `glyphs.size` 动态取值，不硬编码 1,425。
 
 | 层 | 边界表现 | 处理方式 |
 | --- | --- | --- |
-| 数据层 | 只有 1,425 个 `glyphChar` | 不生成合成字形；glyph-only 字形记录 `headword: null, shuowen: null` |
+| 数据层 | 只有字形库内的 `glyphChar` | 不生成合成字形；glyph-only 字形记录 `headword: null, shuowen: null` |
 | `zhenren_burn` | 命辞可能含未收字 | 返回 `chargeGlyphs` 与 `missing`；不阻断灼龟 |
 | `zhenren_inscribe` | 卜辞可能含未收字 | `glyphPlan` 标记 `found`/`placeholder`；保留槽位；`ok: true` 仍可成立 |
-| 动画层 | 字体只有 1,425 个码位 | 只画字体字形；缺字画空刻占位；不画“想象中的甲骨文” |
+| 动画层 | 字体 1,425 码位 + 精选图像 | 按 `glyphSource` 画字体或图像字形；缺字画空刻占位；不画“想象中的甲骨文” |
 | 文本层 | 模型可能想写未收字 | 提示词禁止编造；改写为可用字，或接受占位并在现代释义里说明 |
-| UI 层 | 用户可能问“为什么缺字” | 页脚注明“字形库 1,425 字；未收字以空刻表示” |
+| UI 层 | 用户可能问“为什么缺字” | 页脚注明“字形库 N 字；未收字以空刻表示”（N 为实际字数） |
 | 导出层 | 导出图片可能被脱离上下文 | 导出物带同样的边界说明与出处；不做事后补字 |
 
 关键规则：
 
-> **未收字返回 `found: false`，不编造字形。1,425 字是客观上限。缺字在卜辞里表现为“空刻”，不是错误，也不是可以绕过的限制。**
+> **未收字返回 `found: false`，不编造字形。字形库是客观上限。缺字在卜辞里表现为“空刻”，不是错误，也不是可以绕过的限制。**
 
 ### 3.7 静态数据文件
 
 ```text
 packages/zhenren/data/
-├── oracle.json              # 1,425 字形 + 1,181 字头；host 运行时读取
+├── oracle.json              # 字形（字体 + 图像）+ 字头；host 运行时读取
 ├── alias-overrides.json     # 人工字头/别名裁决；构建期合并
+├── vernacular-overrides.json# 白话转述草稿（D18）；构建期合并，人工产物
+├── hust-glyphs.json         # D17 图像字形清单 + 出处；build-images.py 产出，抽取读取
 ├── manifest.json            # 计数、源哈希、许可、schemaVersion
 ├── extraction-report.json   # 解析报告、冲突、未匹配清单；审计用
+├── glyphs/                  # D17 图像字形 PNG（每字一张，墨色归一化）
+│   └── <codepoint>.png
 └── fonts/
     ├── orac.woff2           # 原样字体
     └── OFL.txt              # OFL-1.1 文本
@@ -538,7 +580,9 @@ packages/zhenren/data/
 
 约束：
 
-- `oracle.json` 只含 1,425 条字形记录与 1,181 条字头记录，不含完整 9,815 条 `SW`。完整 `SW` 只在构建期读取。
+- `oracle.json` 只含字形库记录（字体 1,425 + 图像字形）与字头记录，不含完整 9,815 条 `SW`。完整 `SW` 只在构建期读取。
+- `vernacular-overrides.json` 是人工/批量草稿产物，重抽取不得覆盖；条目按 `headword` 键，值为一句白话转述，全部 `draft`。
+- `hust-glyphs.json` 与 `glyphs/` 由 `scripts/expand-hust/build-images.py` 产出；选字清单 `scripts/expand-hust/selection.json` 是人工产物，重跑不覆盖。
 - `alias-overrides.json` 是人工维护文件；重新抽取不得覆盖它。每条必须带 `kind`：
 
   ```json
@@ -570,7 +614,7 @@ host 启动时：
 4. 校验查询不变量：每个 `GlyphRecord.headword` 要么为 `null`，要么存在于字头 Map；别名 Map 的键不与字形 Map 重叠；
 5. 冻结索引；后续查询只读。
 
-规模只有 1,425 条字形与 1,181 条字头，内存可忽略；不需要数据库、不需要懒加载、不需要文件监听。插件重载时重建索引即可。
+规模只有字形库（字体 1,425 + 精选图像字形）与千余条字头，内存可忽略；不需要数据库、不需要懒加载、不需要文件监听。插件重载时重建索引即可。
 
 失败策略：
 
@@ -586,7 +630,8 @@ host 启动时：
 - **shuowen.org 文本**：Apache-2.0。`shuowen.original` 是逐字引用；`vernacular` 是我们的现代转述，必须与原文区分；`correction` 来自 yigezi `XZ`，单独署名。
 - **yigezi**：MIT。数据抽取与 `XZ` 旁注需要署名。
 - **OpenCC**：Apache-2.0。只在构建期使用；如果分发了由它生成的 s2t 表，带 OpenCC 声明。
-- **PHONO-ML / 广韵形声考**：不进入生成物。`mc`、`pos`、`oc`、`ocsrc` 全部排除。这样当前许可面收敛为 OFL-1.1 + Apache-2.0 + MIT（+ 构建期 OpenCC 的 Apache-2.0）。
+- **HUST-OBC 已释字图像**（D17）：古文字字形本身属公有领域；本项目为开源公益性质，使用其已释字图像作为字形素材。保留 HUST-OBC（arXiv 2401.15365）与原始出处（《新甲骨文编》/国学大师/殷契文渊/HWOBC/六位数字编码）署名；只随包分发精选子集，不分发全量图库。
+- **PHONO-ML / 广韵形声考**：不进入生成物。`mc`、`pos`、`oc`、`ocsrc` 全部排除。这样当前许可面收敛为 OFL-1.1 + Apache-2.0 + MIT + 公有领域字形（+ 构建期 OpenCC 的 Apache-2.0）。
 
 署名落点：
 
@@ -598,7 +643,7 @@ host 启动时：
 
 “关于”卡片的文案基线：
 
-> 字形：Oracular（OFL-1.1）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。兆纹为艺术化表现，非考古复原。
+> 字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。兆纹为艺术化表现，非考古复原。
 
 这段文案是产品可见字符串，放在 locale 字典里，不要在组件里硬编码。
 
@@ -765,6 +810,7 @@ dsh-plugins/
     { "char": "其", "found": true, "headword": null, "glyphChar": "其", "glossFound": false }
   ],
   "missing": [],
+  "supportedCount": 1628,
   "attribution": "字形：Oracular（OFL-1.1）；《说文》：shuowen.org（Apache-2.0）。"
 }
 ```
@@ -776,12 +822,13 @@ dsh-plugins/
 - `reading` 是兆象的语义摘要，供模型措辞；不是第二套吉凶。
 - `chargeGlyphs` 让模型知道命辞里哪些字没有字形；如果有 `missing`，模型可以在写占辞/卜辞时改写，或接受空刻。
 - `burnPoint` 是归一化坐标；client 用它做灼点与裂纹起点。
+- `supportedCount` 是字形库当前字数（`glyphs.size`，字体 + 图像），随数据版本动态取值；它同时进入 `value` 与 meta，供页脚边界说明（§3.6）显示「字形库 N 字」。放进 `value` 是为了让 meta 成为纯投影，不在投影里读数据层。
 
 #### `presentationMeta`（client 可见）
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "kind": "zhenren.burn",
   "divinationId": "div_01J...",
   "seed": "8f3c...",
@@ -808,6 +855,7 @@ dsh-plugins/
     "glow": { "radius": 0.08, "temperature": 0.6, "fadeMs": 600 },
     "bounds": { "x": 0.08, "y": 0.08, "w": 0.84, "h": 0.84 }
   },
+  "supportedCount": 1628,
   "attribution": "字形：Oracular（OFL-1.1）；《说文》：shuowen.org（Apache-2.0）。"
 }
 ```
@@ -816,6 +864,7 @@ dsh-plugins/
 
 - `presentationMeta` 只由 `value` 派生，不重新抽随机数；同一个结果重放必须一致。
 - 不把完整 `chargeGlyphs`、完整释义塞进 meta；meta 只放视觉需要的字段。模型需要的语义信息在 `value` 里。
+- `supportedCount` 取自 `value.supportedCount`；旧 meta 无此字段时解析为 0，页脚省略字数行（仍显示边界句），不崩溃。
 - meta 预算控制在几十 KB 内；裂纹点过多时先降采样，不要把会话日志当资产仓库。
 
 #### 行为
@@ -898,6 +947,7 @@ dsh-plugins/
     }
   ],
   "layoutSummary": "3 columns, right-to-left",
+  "supportedCount": 1628,
   "attribution": "字形：Oracular（OFL-1.1）；《说文》：shuowen.org（Apache-2.0）。"
 }
 ```
@@ -908,19 +958,21 @@ dsh-plugins/
 - `ok: false` 只用于输入非法：空卜辞、超过最大字数、布局无法成立、`divinationId` 格式非法且无法降级。
 - `glyphs` 里的 `shuowen` 可以只对 `highlight` 字完整返回；其余字可以只返回 `glossFound`，避免 48 字 × 完整释义把上下文撑大。
 - `layoutSummary` 给模型一个可读的布局描述；完整布局在 meta 里。
+- `supportedCount` 是字形库当前字数（`glyphs.size`），含义与 burn 一致；`ok: false` 时为 0（失败卡走文本兜底，不渲染页脚）。
 
 #### `presentationMeta`（client 可见）
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "kind": "zhenren.inscribe",
   "divinationId": "div_01J...",
   "burnSeed": "8f3c...",
   "glyphs": [
-    { "slot": 0, "char": "贞", "found": true, "glyphChar": "貞" },
-    { "slot": 5, "char": "其", "found": true, "glyphChar": "其" },
-    { "slot": 12, "char": "福", "found": false, "placeholder": true }
+    { "slot": 0, "char": "贞", "found": true, "glyphChar": "貞", "glyphSource": "font" },
+    { "slot": 5, "char": "其", "found": true, "glyphChar": "其", "glyphSource": "font" },
+    { "slot": 8, "char": "福", "found": true, "glyphChar": "福", "glyphSource": "image" },
+    { "slot": 12, "char": "龘", "found": false, "glyphChar": null, "glyphSource": "font", "placeholder": true }
   ],
   "layout": {
     "columns": 3,
@@ -943,17 +995,20 @@ dsh-plugins/
       "correction": null
     }
   ],
-  "attribution": "字形：Oracular（OFL-1.1）；《说文》：shuowen.org（Apache-2.0）。"
+  "supportedCount": 1628,
+  "attribution": "字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域）；《说文》：shuowen.org（Apache-2.0）。"
 }
 ```
 
 约束：
 
+- **meta 版本 2（D17）**：`MetaGlyph` 增加 `glyphSource: "font" | "image"`，client 据此选渲染分支。新 client 同时解析 v1 与 v2：v1 字形默认 `glyphSource: "font"`；v2 缺/坏 `glyphSource` 走文本兜底。旧 client 遇到 v2 无法解析时落 generic 文本行，对话仍可读。
 - meta 里的 `glyphs` 只保留渲染必需字段，不重复完整释义；完整释义在 `value` 里给模型。
 - 示例的 `layout.slots` 与 `carve.chars` 只列出一个槽位；实际每个槽位都有一条，缺字槽位也有一条（用空刻表现）。
 - `highlightGlosses` 只放模型点名的字，最多 5 条；避免卡片变成字典页。
 - `carve` 的 `startMs` 是相对本卡片时间线的偏移，不是绝对时间。
 - 布局坐标归一化到甲面；client 按自己的 canvas 尺寸缩放。
+- `supportedCount` 取自 `value.supportedCount`；旧 meta 无此字段时解析为 0，页脚省略字数行（仍显示边界句）。
 
 #### 行为
 
@@ -1152,6 +1207,13 @@ dsh-plugins/
 - **服务端渲染 GIF/视频**：失去实时重放与交互；字体/数据上传到服务端也违背隐私边界。
 
 Canvas 是展示层，不是事实层。事实是 host 生成的 `RitualSpec`；Canvas 只负责插值与绘制。
+
+**GlyphSource 抽象（D17）**：刻辞渲染不锁死单一字体。client 把每个槽位的字形抽象为 `GlyphSource`：
+
+- `{ kind: "font", char, fontFamily }`：`fillText` 画 Oracular 码位字形（原有路径）。
+- `{ kind: "image", char, image }`：`drawImage` 画随包 PNG（HUST-OBC 归一化字形）。
+
+两种来源共用同一套刻痕遮罩、力度、底痕与空刻逻辑。图像字形在构建期已做墨色归一化（浅底深墨→透明底单色墨），client 再用刻痕墨色（`CARVE_INK` 等）着色，与字体字形风格一致，避免「拓片贴图」感。`meta.glyphs[*].glyphSource` 决定分支；图像未加载时该槽位走文本兜底，不画 tofu。
 
 ### 5.2 时间轴
 
@@ -1396,18 +1458,20 @@ mount
 
 ### 6.2 语料增强
 
-**什么时候值得做**：1,425 字边界成为主要用户抱怨；或出现许可清晰、带字形与释义的甲骨语料。
+**已落地（D17）**：HUST-OBC 已释字图像的首批精选子集已接入——`GlyphSource`（码位字体 / 图片）抽象、图像出处元数据、墨色归一化渲染均已实现。本节其余内容仍是未来演进方向。
+
+**什么时候值得做**：字形库边界成为主要用户抱怨；或出现许可清晰、带字形与释义的甲骨语料。
 
 **候选**：JieZi、OBIMD 等开放甲骨数据集。逐个评估：许可、覆盖、字形格式、学术出处。
 
 **做法**：
 
-- 保持 `OracleRecord` 契约不变；增加 `variants`、`period`、`findspot`、`inscriptionContext`、`glyphSource`。
+- 保持 `OracleRecord` 契约不变；增加 `variants`、`period`、`findspot`、`inscriptionContext`。
 - 查询可以返回多条记录；UI 可以展示异体字形。
-- 字体可能不止一个；渲染层抽象出 `GlyphSource`（码位字体 / SVG path / 图片），不要锁死单一字体。
+- 字体可能不止一个；`GlyphSource` 抽象（D17）已就位，可扩展 SVG path 等来源，不要锁死单一字体。
 - 每条记录带 `source`；不混合来源而不标出处。
 
-**不做**：在许可不清时先把数据接进来；用未授权语料“先跑起来”。
+**不做**：在许可不清时先把数据接进来；用未授权语料“先跑起来”；随包分发 HUST-OBC 全量图库；运行时 OCR/相似度模型。
 
 ### 6.3 部首/声符检索
 
@@ -1464,7 +1528,7 @@ mount
 | 演进 | 触发条件 | 不应在此之前做 |
 | --- | --- | --- |
 | 验辞 | 重复使用 / 用户主动回访 | 核心仪式还不稳定时 |
-| 语料增强 | 1,425 边界成为主要抱怨；许可清晰 | 数据契约未稳定时 |
+| 语料增强 | 字形库边界成为主要抱怨；许可清晰 | 数据契约未稳定时 |
 | 部首检索 | 用户明确想按构件找字 | 核心仪式未稳定时 |
 | 声符检索 | 许可明确 | 未获明确许可时 |
 | 多材质 | 视觉疲劳 / 用户明确要求 | 核心仪式未稳定时 |
@@ -1542,10 +1606,11 @@ mount
 
 ### D10 许可边界
 
-- **背景**：Oracular OFL-1.1；shuowen.org Apache-2.0；yigezi MIT；PHONO-ML CC BY 4.0；广韵形声考许可不明。
-- **决定**：只发布《说文》文本 + 我们的白话转述 + `XZ` 纠正；排除 `mc`/`pos`/`oc`/`ocsrc`；署名落在 notices、关于卡、manifest；当前不子集化字体。
+- **背景**：Oracular OFL-1.1；shuowen.org Apache-2.0；yigezi MIT；PHONO-ML CC BY 4.0；广韵形声考许可不明；HUST-OBC 已释字图像的字形属公有领域（D17）。
+- **决定**：只发布《说文》文本 + 我们的白话转述 + `XZ` 纠正 + D17 精选图像字形；排除 `mc`/`pos`/`oc`/`ocsrc`；署名落在 notices、关于卡、manifest；当前不子集化字体；HUST-OBC 保留原始出处署名，不分发全量图库。
 - **后果**：许可面干净；没有音韵功能；数据更小；未来做音韵需单独评估。
 - **替代**：带音韵但署名（拒绝：许可不清）；不带署名（拒绝：侵权）。
+- **更新**：D17 取代本条原先对 HUST-OBC 的许可闸门（原 6.2 要求“许可清晰才接入”）；公有领域字形 + 开源公益性质构成接入依据。
 
 ### D11 内联卡片载体
 
@@ -1568,9 +1633,9 @@ mount
 - **后果**：隐私、离线、可预测；更新靠包发布；没有服务端特性。
 - **替代**：云端语料查询（拒绝：隐私与依赖）；匿名分析（拒绝：非必要）。
 
-### D14 1,425 边界是一等约束
+### D14 字形库边界是一等约束
 
-- **背景**：它是字体与数据的硬上限，影响数据、工具、动画、文本、导出。
+- **背景**：它是字体与数据的硬上限，影响数据、工具、动画、文本、导出。字体层 1,425；D17 扩容后为 `1,425 + 图像字数`，边界随 `glyphs.size` 动态取值。
 - **决定**：每一层都显式处理；库外 `found: false`；库内缺字空刻；无例外。
 - **后果**：行为可预测、诚实；模型需要被明确告知；UI 需要解释。
 - **替代**：静默替换或生成字形（拒绝：伪造）。
@@ -1588,6 +1653,33 @@ mount
 - **决定**：`zhenren_inscribe` 接受可选 `layout.direction`，取 `rtl`（右上起、列自右向左，默认）或 `ltr`（左上起、列自左向右）；host 只按该值计算槽位，不自行改判。提示词要求模型观察甲面留白与兆纹位置后自行选择。`presentationMeta.layout.direction` 记录最终值，`layoutSummary` 输出 `left-to-right` / `right-to-left`。
 - **后果**：布局随模型判断变化，同一段卜辞可能有两种排布；meta 契约与解析器都要校验 `direction`；旧 meta 没有该字段时按 `rtl` 兜底。
 - **替代**：固定右起（拒绝：与甲面留白/兆纹位置脱节）；让用户手选（拒绝：仪式中不应多一步交互）；按字数自动选（拒绝：语义与视觉判断应交由贞人）。
+
+### D17 HUST-OBC 图像字形扩容
+
+- **背景**：字体库封闭在 1,425 字，HUST-OBC 已释字 1,781 中有 484 字在库外，部分常用字（福、書、色、航、貴、賜、避、離、霧、音、騎等）刻不出，空刻偏多。古文字字形本身属公有领域；本项目开源、公益、免费，决定使用 HUST-OBC（arXiv 2401.15365）已释字图像作为字形素材。此决策取代 6.2 / D10 原先对 HUST-OBC 的许可闸门。
+- **决定**：
+  - **精选子集，不搬全量图库**：覆盖审计（`scripts/expand-hust/audit.mjs`）产出 484 候选，按现代常用度人工选字（`selection.json`），首批约 200 字。每字挑 1 张代表图像，构建期裁剪/墨色归一化为小 PNG 随包发布。
+  - **字形来源维度**：`oracle.json` `schemaVersion` 升到 2；`GlyphRecord` 增加 `source: "font" | "image"`，图像字形带 `image` 出处（file/hustId/source/citation/collection/group）。`counts` 增加 `fontGlyphs`/`imageGlyphs`。
+  - **GlyphSource 抽象**：client 渲染分码位字体 / 图片两分支，共用刻痕遮罩与空刻逻辑；图像墨色统一，避免「拓片贴图」感。
+  - **meta 版本 2**：`MetaGlyph` 增加 `glyphSource`；新 client 解析 v1+v2（v1 默认 font），旧 client 遇 v2 落文本兜底。
+  - **边界传播**：新字数成为新硬边界，`supportedCount`/页脚/提示词随 `glyphs.size` 动态取值；`found` 语义与「精确字形 > 别名 > not found」查询顺序不变。
+  - **署名**：保留 HUST-OBC 与原始出处（《新甲骨文编》/国学大师/殷契文渊/HWOBC/六位数字编码），落 notices / manifest / 关于卡。
+- **后果**：常用字可刻率上升；数据与渲染多一个来源维度；包体积增加精选 PNG（每字约 1–3KB）；构建管线多一步图像归一化。其余边界不变：不伪造字形、运行时零网络、无数据库、不做运行时 OCR/相似度模型。
+- **替代**：搬全量 14.5 万张图（拒绝：体积与噪声）；运行时 OCR/相似度匹配（拒绝：torch 重依赖违反 D9）；合成字形补缺（拒绝：伪造）。
+
+### D18 白话转述构建期合并
+
+- **背景**：1,181 个字头的 `vernacular` 全为空串，「读」阶段数据层空转，现代释义全靠模型自身知识。
+- **决定**：构建期批量生成草稿，先覆盖高频占卜字约 200 个，逐步铺满全部字头；落盘 `data/vernacular-overrides.json`，抽取时按 `headword` 合并进 `shuowen.vernacular`，全部标 `draft`。复用 alias-overrides 的「重抽取不覆盖人工产物」模式。UI 与提示词已兼容空/非空分支，零契约改动。
+- **后果**：卡片「现代转述」可见；转述是我们生成的辅助文本，必须与《说文》原文区分，未审校标「现代转述」；有人审校后再标 `reviewed`。
+- **替代**：运行时让模型现写转述（拒绝：不可重放、不持久）；把转述冒充 shuowen.org 原文（拒绝：伪造）。
+
+### D19 字形库字数经 value 传入 meta，页脚动态显示
+
+- **背景**：§3.6 要求页脚注明「字形库 N 字；未收字以空刻表示」，N 随 `glyphs.size` 动态取值（D17）。client 不读 host 配置（§4.10），N 必须随结果持久化。若让 `presentationMeta` 直接调 `getIndex()` 取 N，inscribe 的失败路径（`failure()` 不触数据层）在数据缺失时会在投影里抛错，违背「meta 必须降级、不抛错」。
+- **决定**：`supportedCount` 同时进入 burn/inscribe 的模型可见 `value`（execute 中已持有 index；inscribe `ok: false` 时为 0）与 `presentationMeta`。meta 纯投影自 `value.supportedCount`，不在投影里读数据层。client 用 locale 模板 `card.corpus`（`字形库 {n} 字；未收字以空刻表示。`）渲染；解析器对旧 meta 缺字段降级为 0，页脚省略字数行但保留边界句。
+- **后果**：页脚字数随数据版本动态、可重放；meta 保持纯函数；模型也被告知字形库边界（D14）。新增一个整数字段，meta 体积可忽略。
+- **替代**：meta 内调 `getIndex()`（拒绝：失败路径抛错风险、破坏纯投影）；locale 硬编码 N（拒绝：违反 D14 动态边界）；client 读 host 配置（拒绝：违反 §4.10）。
 
 ---
 
@@ -1613,7 +1705,8 @@ mount
 | 字体是否子集化 | 不子集化；397KB 可接受 | 包体积成为问题时，按 OFL 改名 |
 | dsh client API 稳定性 | 只用文档化的 `phase`、`block.meta`、`block.args`；其余不依赖 | dsh 升级导致视图 API 变化时 |
 | 兆纹映射是否需要专家审 | 先标艺术约定；如用于教育场景，请领域专家审视觉语法与措辞 | 进入教育/博物馆场景前 |
-| 是否接入 JieZi/OBIMD | 先不接；等许可与覆盖清晰 | 1,425 边界成为主要问题时 |
+| 是否接入 JieZi/OBIMD | 先不接；等许可与覆盖清晰（HUST-OBC 已经 D17 接入首批） | 字形库边界成为主要问题时 |
+| HUST-OBC 后续批次 | 首批约 200 字已接入；其余候选按常用度与图像质量小步扩 | 用户频繁问到库外字时 |
 | 是否做声符检索 | 先只做部首；声符许可未清 | 许可明确后 |
 | 是否做导出 | 当前不做；如做，必须带出处与边界说明 | 用户明确需要分享时 |
 | meta 大小上限 | 先按几十 KB 控制；超了先降采样裂纹 | dsh 会话日志出现压力时 |
@@ -1625,7 +1718,7 @@ mount
 - dsh 增加了一等的自定义卡片/Canvas/动画 API，`tool.call.toolview` 不再是唯一选择。
 - yigezi 的数据结构或许可发生变化，抽取脚本或数据契约需要调整。
 - 出现许可清晰、覆盖更广的甲骨语料（含字形与释义）。
-- 1,425 边界成为主要用户抱怨，而不是可解释的限制。
+- 字形库边界成为主要用户抱怨，而不是可解释的限制。
 - 模型无法稳定遵循两步工具链（burn → inscribe），需要合并或增加中间工具。
 - 字体许可/Reserved Font Name 成为发布障碍。
 - 会话日志对 `presentationMeta` 大小提出硬限制。
@@ -1653,6 +1746,10 @@ mount
 | 字形与说文头不同 | 63 | 绘制用 `glyphChar`，释义用 `headword` |
 | 字体 cmap 条目 | 1,426 | `orac.woff2`；含 1 条 U+FFFF 非字符，有效 1,425 |
 | 唯一字形 | 1,315 | 102 个共享字形 / 110 个额外码位 |
+| HUST-OBC 已释字 | 1,781 | `ID_to_chinese.json`；图像 65,758 张（53,788 PNG + 11,970 JPG） |
+| HUST 库外候选 | 484 | 1,781 − 1,297 已覆盖；全部为图像字形候选 |
+| D17 首批图像字形 | 约 200 | 按现代常用度精选；实际以 `counts.imageGlyphs` 为准 |
+| 扩容后字形库 | 1,425 + 图像字数 | `counts.glyphs`；边界动态取值 |
 | `SW` 带 `w` 条目 | 1,061 | 反向重文索引来源 |
 | `TS` 条目 | 2,151 | 简体→繁体/异体 |
 | `XZ` 条目 | 10 | 古文字纠正 |
@@ -1727,14 +1824,14 @@ mount
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "kind": "zhenren.inscribe",
   "divinationId": "div_01J...",
   "burnSeed": "8f3c...",
   "glyphs": [
-    { "slot": 0, "char": "贞", "found": true, "glyphChar": "貞" },
-    { "slot": 5, "char": "其", "found": true, "glyphChar": "其" },
-    { "slot": 12, "char": "福", "found": false, "placeholder": true }
+    { "slot": 0, "char": "贞", "found": true, "glyphChar": "貞", "glyphSource": "font" },
+    { "slot": 5, "char": "其", "found": true, "glyphChar": "其", "glyphSource": "font" },
+    { "slot": 12, "char": "龘", "found": false, "glyphChar": null, "glyphSource": "font", "placeholder": true }
   ],
   "layout": {
     "columns": 3,
@@ -1750,7 +1847,7 @@ mount
     ]
   },
   "highlightGlosses": [],
-  "attribution": "字形：Oracular（OFL-1.1）；《说文》：shuowen.org（Apache-2.0）。"
+  "attribution": "字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域）；《说文》：shuowen.org（Apache-2.0）。"
 }
 ```
 
@@ -1758,13 +1855,17 @@ mount
 
 | 文件 | 职责 | 运行时？ |
 | --- | --- | --- |
-| `data/oracle.json` | 1,425 条字形 + 1,181 条字头 + 别名索引 | 是（host） |
+| `data/oracle.json` | 字形（字体 + 图像）+ 字头 + 别名索引 | 是（host） |
 | `data/alias-overrides.json` | 人工字头/别名裁决 | 构建期 |
+| `data/vernacular-overrides.json` | 白话转述草稿（D18） | 构建期 |
+| `data/hust-glyphs.json` | D17 图像字形清单 + 出处 | 构建期 |
+| `data/glyphs/*.png` | D17 图像字形 | 是（client） |
 | `data/manifest.json` | 计数/哈希/许可 | 构建期 + 可选运行时校验 |
 | `data/extraction-report.json` | 解析报告/未匹配清单 | 构建期 |
 | `data/fonts/orac.woff2` | 字形 | 是（client） |
 | `data/fonts/OFL.txt` | 字体许可 | 随包发布 |
 | `scripts/extract-yigezi/` | 离线抽取 | 否 |
+| `scripts/expand-hust/` | D17 覆盖审计 / 选字 / 图像管线 | 否 |
 | `src/data/schema.ts` | 记录/查询类型 | 编译期/运行时校验 |
 | `src/data/lookup.ts` | 别名查询 | 是（host） |
 | `src/ritual/crack.ts` | 兆纹生成 | 是（host） |
@@ -1787,9 +1888,9 @@ mount
 - **验辞**：事后记录的结果。
 - **重文**：同一字的不同写法；`SW.w` 字段。
 - **说文头**：《说文解字》的字头，可能是古文字形（朙、亾、㠯）。
-- **字形库**：本插件支持的 1,425 个甲骨字形。
+- **字形库**：本插件支持的甲骨字形集合——Oracular 字体 1,425 字 + D17 精选 HUST-OBC 图像字形。
 - **空刻**：卜辞中遇到未收字时保留的空白刻位，不是错误，也不是伪造字形。
-- **glyphChar**：1,425 字之一，用来索引 `orac.woff2` 的码位。
+- **glyphChar**：字形库的一员；`source: "font"` 时用来索引 `orac.woff2` 的码位，`source: "image"` 时用来索引随包 PNG。
 - **headword**：字头表的主键；说文形体。字形记录通过 `headword` 字段引用它；无释义时为 `null`。
 
 ### E. 参考文件
@@ -1816,7 +1917,7 @@ mount
 
 1. 先读第 1–4 节，再动手；第 5 节是动画契约，第 7 节是决策约束。
 2. 不要改 3.4/3.5/4.4/4.5 的契约而不更新本文件；要改先加一条 ADR。
-3. 1,425 边界与 `found: false` 不可协商；不要用“看起来像”的字形补洞。
+3. 字形库边界与 `found: false` 不可协商；不要用“看起来像”的字形补洞。
 4. 不引入重型运行时依赖；不加数据库；不把卡片移到侧栏；不做全局 overlay。
 5. 第 2 节的事实如果过期，先回 `.refs` 核对，再相信记忆。
 6. 目录树是建议，不是契约；契约是接口、数据文件与行为规则。

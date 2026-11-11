@@ -105,6 +105,7 @@ function BurnCard(props: { meta: BurnPresentationMeta; t: BurnRowProps['t'] }): 
         <span style={styles.attributionStyle}>
           <div>{meta.attribution}</div>
           <div>{t('card.boundary')}</div>
+          {meta.supportedCount > 0 ? <div>{t('card.corpus', { n: meta.supportedCount })}</div> : null}
         </span>
         {animatable ? (
           <>
