@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-zhenren",
-  "version": "1.1.0-beta.1",
+  "version": "2.0.0",
   "description": "甲骨贞人: an oracle-bone divination ritual plugin for DeepSeek Harness",
   "type": "module",
   "license": "MIT",
@@ -26,7 +26,9 @@
       "inject": [
         "@deepseek-ai/dsh-client-locale",
         "@deepseek-ai/dsh-client-ui-renderer",
-        "@deepseek-ai/dsh-client-ui-tool"
+        "@deepseek-ai/dsh-client-ui-tool",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-settings"
       ]
     }
   },
@@ -52,7 +54,9 @@
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.0.5-alpha.1",
     "@deepseek-ai/dsh-client-locale": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-conversation": "^0.2.0-rc.2",
     "@deepseek-ai/dsh-client-ui-renderer": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-settings": "^0.2.0-rc.2",
     "@deepseek-ai/dsh-client-ui-slots": "^0.2.0-rc.2",
     "@deepseek-ai/dsh-client-ui-tool": "^0.2.0-rc.2",
     "@deepseek-ai/dsh-llm": "^0.2.0-rc.2",
@@ -66,6 +70,7 @@
     "@deepseek-ai/dsh-client-ui-chat": "0.2.1-alpha.2",
     "@deepseek-ai/dsh-client-ui-conversation": "0.2.1-alpha.2",
     "@deepseek-ai/dsh-client-ui-renderer": "0.2.1-alpha.2",
+    "@deepseek-ai/dsh-client-ui-settings": "0.2.1-alpha.2",
     "@deepseek-ai/dsh-client-ui-slots": "0.2.1-alpha.2",
     "@deepseek-ai/dsh-client-ui-tool": "0.2.1-alpha.2",
     "@deepseek-ai/dsh-llm": "0.2.1-alpha.2",

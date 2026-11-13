@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 2,
-  "generatedAt": "2026-11-11",
+  "schemaVersion": 3,
+  "generatedAt": "2026-11-13",
   "source": {
     "snapshot": "yigezi-main",
     "indexHtmlSha256": "276d116fc0818183f03ce6542856718007d63619d75cf4c57252c331e269ddcd",
@@ -9,7 +9,9 @@
     "opencc": "opencc-js 1.4.2 (build-time only)",
     "shuowen": "shuowen.org via yigezi",
     "images": "HUST-OBC deciphered (arXiv 2401.15365)",
-    "hustGlyphsSha256": "a53f429a56c70b2d07d9e4a9be57a1b823ec8565151ada0d7d8ba3bbbdc7b370"
+    "hustGlyphsSha256": "a53f429a56c70b2d07d9e4a9be57a1b823ec8565151ada0d7d8ba3bbbdc7b370",
+    "inlineFontSha256": "0ef2ddc12b778d37bad47490745c15277c5891b7565488d8298aa2dd20b3ee08",
+    "inlineMapSha256": "fc1dfbcf4498111ee9d943798a771e912b113552b0ebb246cd1cf30ccc1199ab"
   },
   "counts": {
     "glyphs": 1628,
@@ -31,12 +33,18 @@
     "sharedGlyphs": 102,
     "extraCodepoints": 110
   },
+  "content": {
+    "vernacularWritten": 1384,
+    "evolutionWritten": 222,
+    "inlineWritten": 1628
+  },
   "licenses": {
     "font": "OFL-1.1",
+    "inlineFont": "OFL-1.1 (ZhenrenInline, renamed derivative of Oracular)",
     "shuowen": "Apache-2.0",
     "yigezi": "MIT",
     "opencc": "Apache-2.0 (build-time only)",
     "images": "public-domain glyphs (HUST-OBC, arXiv 2401.15365)"
   },
-  "attribution": "字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。兆纹为艺术化表现，非考古复原。"
+  "attribution": "字形：Oracular（OFL-1.1）及其改名衍生 ZhenrenInline（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。兆纹为艺术化表现，非考古复原。"
 }

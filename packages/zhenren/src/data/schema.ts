@@ -36,6 +36,22 @@ export interface ShuowenGloss {
   correction: CorrectionRef | null
 }
 
+/** One stage of a glyph's evolution, described in text only (D23). */
+export interface EvolutionStage {
+  /** 甲骨 / 金文 / 小篆 / 隸書 / 楷書. */
+  name: string
+  note: string
+}
+
+/**
+ * Glyph evolution description (D23). Text only — never carries glyph images
+ * we do not ship. `null` on a headword means "演变资料整理中".
+ */
+export interface EvolutionSpec {
+  stages: EvolutionStage[]
+  status: 'draft' | 'reviewed'
+}
+
 /** Gloss record, keyed by 说文 headword. */
 export interface HeadwordRecord {
   shuowen: ShuowenGloss
@@ -43,6 +59,8 @@ export interface HeadwordRecord {
   radical: string | null
   /** Reverse reference, derived at build time and sorted by codepoint. */
   glyphChars: string[]
+  /** Evolution description merged from evolution-overrides.json (D23). */
+  evolution: EvolutionSpec | null
   sources: { shuowen: string }
 }
 
@@ -80,6 +98,11 @@ export interface GlyphRecord {
   resolvedBy: ResolvedBy
   /** Rendering branch (D17). Font glyphs draw a codepoint; image glyphs a PNG. */
   source: GlyphSource
+  /**
+   * Inline PUA codepoint for prose (D21), or null when the glyph cannot be
+   * inlined (font script not run, or image sbix not embedded).
+   */
+  inline: string | null
   /** Present only when `source === 'image'`. */
   image?: GlyphImageProvenance
 }
@@ -128,6 +151,10 @@ export interface OracleLookupFound {
   glyphSource: GlyphSource
   headword: string | null
   shuowen: ShuowenGloss | null
+  /** Inline PUA char for prose (D21); null when inline is unsupported. */
+  inline: string | null
+  /** Evolution of the headword (D23); null when headword is null or uncovered. */
+  evolution: EvolutionSpec | null
   matchedBy: 'glyph' | 'alias'
   sources: SourceRef[]
 }
@@ -142,8 +169,8 @@ export interface OracleLookupMissing {
   supportedCount: number
 }
 
-/** The only schemaVersion this build understands (D17 added the source dim). */
-export const ORACLE_SCHEMA_VERSION = 2
+/** The only schemaVersion this build understands (D21/D23: inline + evolution). */
+export const ORACLE_SCHEMA_VERSION = 3
 
 /** Fixed font-layer size. The full corpus boundary is `index.supportedCount`. */
 export const ORACLE_GLYPH_COUNT = 1425
@@ -219,6 +246,27 @@ function validateShuowen(value: unknown, path: string): ShuowenGloss {
   }
 }
 
+function validateEvolution(value: unknown, path: string): EvolutionSpec | null {
+  if (value === null || value === undefined) return null
+  const record = expectObject(value, path)
+  const status = record.status
+  if (status !== 'draft' && status !== 'reviewed') {
+    fail(`${path}.status`, 'must be "draft" or "reviewed"')
+  }
+  const stages = expectArray(record.stages, `${path}.stages`)
+  if (stages.length === 0) fail(`${path}.stages`, 'must not be empty')
+  return {
+    stages: stages.map((entry, index) => {
+      const stage = expectObject(entry, `${path}.stages[${index}]`)
+      return {
+        name: expectString(stage.name, `${path}.stages[${index}].name`),
+        note: expectString(stage.note, `${path}.stages[${index}].note`),
+      }
+    }),
+    status,
+  }
+}
+
 function validateHeadword(value: unknown, path: string): HeadwordRecord {
   const record = expectObject(value, path)
   const sources = expectObject(record.sources, `${path}.sources`)
@@ -229,6 +277,7 @@ function validateHeadword(value: unknown, path: string): HeadwordRecord {
     glyphChars: expectArray(record.glyphChars, `${path}.glyphChars`).map((entry, index) =>
       expectString(entry, `${path}.glyphChars[${index}]`),
     ),
+    evolution: validateEvolution(record.evolution, `${path}.evolution`),
     sources: { shuowen: expectString(sources.shuowen, `${path}.sources.shuowen`) },
   }
 }
@@ -254,6 +303,17 @@ function validateImageProvenance(value: unknown, path: string): GlyphImageProven
   }
 }
 
+/** A single Private Use Area character (U+E000–U+F8FF), the inline range (D21). */
+function expectInline(value: unknown, path: string): string | null {
+  if (value === null || value === undefined) return null
+  if (typeof value !== 'string') fail(path, 'must be a string or null')
+  const code = value.codePointAt(0)
+  if (value.length !== 1 || code === undefined || code < 0xe000 || code > 0xf8ff) {
+    fail(path, 'must be a single PUA character (U+E000–U+F8FF)')
+  }
+  return value
+}
+
 function validateGlyph(value: unknown, path: string): GlyphRecord {
   const record = expectObject(value, path)
   const resolvedBy = record.resolvedBy
@@ -265,15 +325,17 @@ function validateGlyph(value: unknown, path: string): GlyphRecord {
     fail(`${path}.source`, 'must be "font" or "image"')
   }
   const headword = expectNullableString(record.headword, `${path}.headword`)
+  const inline = expectInline(record.inline, `${path}.inline`)
   if (source === 'image') {
     return {
       headword,
       resolvedBy: resolvedBy as ResolvedBy,
       source,
+      inline,
       image: validateImageProvenance(record.image, `${path}.image`),
     }
   }
-  return { headword, resolvedBy: resolvedBy as ResolvedBy, source }
+  return { headword, resolvedBy: resolvedBy as ResolvedBy, source, inline }
 }
 
 /**
@@ -343,6 +405,15 @@ export function validateOracleData(raw: unknown): OracleData {
     if (glyphs[target] === undefined) {
       fail(`oracle.aliases.${key}`, `targets missing glyph ${target}`)
     }
+  }
+  // D21: inline PUA codepoints must be unique across the corpus.
+  const seenInline = new Set<string>()
+  for (const [char, record] of Object.entries(glyphs)) {
+    if (record.inline === null) continue
+    if (seenInline.has(record.inline)) {
+      fail(`oracle.glyphs.${char}.inline`, 'duplicates PUA codepoint of another glyph')
+    }
+    seenInline.add(record.inline)
   }
 
   if (counts.glyphs !== Object.keys(glyphs).length) {

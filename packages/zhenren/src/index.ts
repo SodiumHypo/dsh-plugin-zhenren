@@ -1,7 +1,8 @@
 /**
  * Host half of 甲骨贞人 (CLAUDE.md §4.8).
  *
- * Registers the two ritual tools and the 贞人 protocol section. The corpus is
+ * Registers the ritual tools, the science lookup tool, and the 贞人 protocol
+ * section. The corpus is
  * loaded lazily on the first tool call, so a broken `data/oracle.json` becomes a
  * `data-unavailable` tool error instead of a plugin that fails to load. The
  * protocol section makes one best-effort load for the live corpus size and
@@ -17,6 +18,7 @@ import { loadOracleIndex, type OracleIndex } from './data/load.js'
 import { PROMPT_SECTION_NAME, promptSectionOrder, promptText } from './prompt.js'
 import { createBurnTool } from './tools/burn.js'
 import { createInscribeTool } from './tools/inscribe.js'
+import { createLookupTool } from './tools/lookup.js'
 import { createDivinationMemory } from './tools/shared.js'
 
 export { Config } from './config.js'
@@ -47,6 +49,8 @@ export function apply(ctx: Context, config: Config = {}): void {
 
   ctx.tools.register(createBurnTool({ getIndex, config: resolved, memory }))
   ctx.tools.register(createInscribeTool({ getIndex, config: resolved, memory }))
+  // Science query (F2): stateless, no divinationId, no auspice.
+  ctx.tools.register(createLookupTool({ getIndex }))
 
   // The protocol quotes the live corpus size (D17). This load is best-effort:
   // a broken data file must not fail the plugin, so fall back to the count-free
@@ -60,6 +64,6 @@ export function apply(ctx: Context, config: Config = {}): void {
   ctx.systemPrompt.section({
     name: PROMPT_SECTION_NAME,
     order: promptSectionOrder(ctx),
-    text: promptText(supportedCount),
+    text: promptText(supportedCount, resolved.ritualInvoke),
   })
 }

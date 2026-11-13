@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T11:03:07.725Z",
+  "generatedAt": "2026-11-13T08:21:09.417Z",
   "counts": {
     "glyphs": 1628,
     "fontGlyphs": 1425,
@@ -1775,5 +1775,9 @@
     "国学大师": 49
   },
   "vernacularWritten": 1384,
-  "vernacularUnwritten": 0
+  "vernacularUnwritten": 0,
+  "evolutionWritten": 222,
+  "evolutionUnwritten": 1162,
+  "inlineWritten": 1628,
+  "inlineUnwritten": 0
 }

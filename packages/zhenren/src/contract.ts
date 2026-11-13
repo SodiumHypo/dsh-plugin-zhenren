@@ -9,6 +9,7 @@
 /** Wire tool names. The slot key must equal these strings exactly. */
 export const TOOL_BURN = 'zhenren_burn'
 export const TOOL_INSCRIBE = 'zhenren_inscribe'
+export const TOOL_LOOKUP = 'zhenren_lookup'
 
 /**
  * Presentation-meta version emitted by this build (D17 added `glyphSource`).
@@ -18,12 +19,19 @@ export const TOOL_INSCRIBE = 'zhenren_inscribe'
 export const META_VERSION = 2
 
 /**
+ * Presentation-meta version for the science card (D21). Independent of the
+ * burn/inscribe v2 lineage: lookup metas start at v1 and carry `glyphSource`
+ * from the outset.
+ */
+export const LOOKUP_META_VERSION = 1
+
+/**
  * Source attribution returned to the model and shown in card footers.
  * The boundary sentence ("兆纹为艺术化表现……") is product copy owned by the
  * locale dictionary (`card.boundary`), so it must not be duplicated here.
  */
 export const ATTRIBUTION =
-  '字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。'
+  '字形：Oracular（OFL-1.1）及其改名衍生 ZhenrenInline（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。'
 
 /**
  * Early v1 metas appended the boundary sentence to `attribution`, while the
@@ -197,6 +205,55 @@ export type InscribePresentationMeta = {
   showShuowen: boolean
   locale: string
   /** Corpus size (glyphs.size) for the dynamic footer boundary line (D19). */
+  supportedCount: number
+  attribution: string
+}
+
+/** A 古文字 correction with its provenance, as carried in a lookup meta. */
+export type MetaCorrection = {
+  text: string
+  source: string
+}
+
+/** One evolution stage, text only (D23). */
+export type MetaEvolutionStage = {
+  name: string
+  note: string
+}
+
+/** Glyph evolution description carried in a lookup meta (D23). */
+export type MetaEvolution = {
+  stages: MetaEvolutionStage[]
+  status: 'draft' | 'reviewed'
+}
+
+/**
+ * `presentationMeta` of `zhenren_lookup` (D21 science card).
+ *
+ * A flat type with nullable found-specific fields rather than a union, so it
+ * stays assignable to `JsonValue`. When `found` is false every glyph/gloss
+ * field is null and `reason` explains the miss.
+ */
+export type LookupPresentationMeta = {
+  version: typeof LOOKUP_META_VERSION
+  kind: 'zhenren.lookup'
+  query: string
+  found: boolean
+  /** Resolved glyphChar; null when not found. */
+  glyphChar: string | null
+  glyphSource: MetaGlyphSource
+  headword: string | null
+  pinyin: string | null
+  /** 说文 original; null when the glyph has no gloss. */
+  original: string | null
+  vernacular: string | null
+  vernacularStatus: 'draft' | 'reviewed' | null
+  correction: MetaCorrection | null
+  evolution: MetaEvolution | null
+  /** Inline PUA char for prose (D21); null when inline is unsupported. */
+  inline: string | null
+  /** Miss reason when not found; null when found. */
+  reason: 'not-in-oracle-corpus' | 'empty-query' | null
   supportedCount: number
   attribution: string
 }
@@ -461,5 +518,92 @@ export function parseInscribeMeta(value: unknown): InscribePresentationMeta | nu
     locale: readLocale(value.locale),
     supportedCount: readSupportedCount(value.supportedCount),
     attribution: normalizeAttribution(attribution),
+  }
+}
+
+function readMetaCorrection(value: unknown): MetaCorrection | null {
+  if (!isObject(value)) return null
+  if (typeof value.text !== 'string' || typeof value.source !== 'string') return null
+  return { text: value.text, source: value.source }
+}
+
+/** Optional enrichment: a malformed evolution degrades to null, not a reject. */
+function readMetaEvolution(value: unknown): MetaEvolution | null {
+  if (!isObject(value) || !Array.isArray(value.stages) || value.stages.length === 0) return null
+  if (value.status !== 'draft' && value.status !== 'reviewed') return null
+  const stages: MetaEvolutionStage[] = []
+  for (const entry of value.stages) {
+    if (!isObject(entry) || typeof entry.name !== 'string' || typeof entry.note !== 'string') {
+      return null
+    }
+    stages.push({ name: entry.name, note: entry.note })
+  }
+  return { stages, status: value.status }
+}
+
+/** A single PUA character (U+E000–U+F8FF), or null. Never throws. */
+function readInline(value: unknown): string | null {
+  if (typeof value !== 'string' || value.length !== 1) return null
+  const code = value.codePointAt(0)
+  if (code === undefined || code < 0xe000 || code > 0xf8ff) return null
+  return value
+}
+
+/** Validate a lookup meta. Returns `null` when the card must fall back to text. */
+export function parseLookupMeta(value: unknown): LookupPresentationMeta | null {
+  if (!isObject(value)) return null
+  if (value.version !== LOOKUP_META_VERSION || value.kind !== 'zhenren.lookup') return null
+  if (typeof value.query !== 'string' || typeof value.found !== 'boolean') return null
+  if (typeof value.attribution !== 'string') return null
+  const supportedCount = readSupportedCount(value.supportedCount)
+  const attribution = normalizeAttribution(value.attribution)
+
+  if (!value.found) {
+    return {
+      version: LOOKUP_META_VERSION,
+      kind: 'zhenren.lookup',
+      query: value.query,
+      found: false,
+      glyphChar: null,
+      glyphSource: 'font',
+      headword: null,
+      pinyin: null,
+      original: null,
+      vernacular: null,
+      vernacularStatus: null,
+      correction: null,
+      evolution: null,
+      inline: null,
+      reason: value.reason === 'empty-query' ? 'empty-query' : 'not-in-oracle-corpus',
+      supportedCount,
+      attribution,
+    }
+  }
+
+  // A found glyph must name a real codepoint and a valid rendering branch.
+  if (typeof value.glyphChar !== 'string') return null
+  if (value.glyphSource !== 'font' && value.glyphSource !== 'image') return null
+  const vernacularStatus =
+    value.vernacularStatus === 'draft' || value.vernacularStatus === 'reviewed'
+      ? value.vernacularStatus
+      : null
+  return {
+    version: LOOKUP_META_VERSION,
+    kind: 'zhenren.lookup',
+    query: value.query,
+    found: true,
+    glyphChar: value.glyphChar,
+    glyphSource: value.glyphSource,
+    headword: typeof value.headword === 'string' ? value.headword : null,
+    pinyin: typeof value.pinyin === 'string' ? value.pinyin : null,
+    original: typeof value.original === 'string' ? value.original : null,
+    vernacular: typeof value.vernacular === 'string' ? value.vernacular : null,
+    vernacularStatus,
+    correction: readMetaCorrection(value.correction),
+    evolution: readMetaEvolution(value.evolution),
+    inline: readInline(value.inline),
+    reason: null,
+    supportedCount,
+    attribution,
   }
 }

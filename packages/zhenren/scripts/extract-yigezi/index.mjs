@@ -2,19 +2,26 @@
  * Offline extraction from the yigezi snapshot (`../../.refs/yigezi-main`).
  *
  * Produces the runtime data contract described in CLAUDE.md §3:
- *   data/oracle.json             headwords + glyphs + aliases
+ *   data/oracle.json             headwords + glyphs + aliases (schemaVersion 3)
  *   data/manifest.json           counts, source hashes, licenses
  *   data/extraction-report.json  resolution paths, unresolved list, conflicts
+ *   data/client-glyphs.json      D23 reduced client dataset (daily glyph + inline)
  *   data/fonts/orac.woff2        byte-identical font copy
- *   data/fonts/OFL.txt           license text
+ *   data/fonts/OFL.txt           license text (correct Oracular copyright, D25)
  *   data/fonts/THIRD_PARTY_NOTICES.md
  *   data/alias-overrides.json    human-maintained overrides (created empty once)
  *   data/vernacular-overrides.json  human/batch paraphrases (D18; created empty once)
+ *   data/evolution-overrides.json   human/batch evolution drafts (D23; created empty once)
  *
  * D17 expansion: when `data/hust-glyphs.json` is present (produced by
  * scripts/expand-hust/build-images.py), its image glyphs are merged into the
  * corpus with `source: "image"` and full provenance. The font layer stays
  * exactly 1,425 glyphs; the total grows by the image count.
+ *
+ * D21 inline: when `data/inline-map.json` is present (produced by
+ * scripts/build-inline-font/build.py), each glyph gets its PUA `inline` char.
+ * Absent → all inline:null with a warning; extraction runs independently.
+ * The ZhenrenInline derivative font itself is produced by the font script, not here.
  *
  * Build-time only. Never imported by the plugin runtime. Deterministic:
  * the same snapshot plus the same overrides produce the same oracle.json.
@@ -36,14 +43,20 @@ const OUT = path.resolve(__dirname, '../../data')
 const FONT_OUT = path.join(OUT, 'fonts')
 const CHECK_ONLY = process.argv.includes('--check')
 
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 3
 /** The font layer is fixed; image glyphs (D17) are added on top of it. */
 const EXPECTED_GLYPH_COUNT = 1425
 const NON_CHARACTER_CODEPOINTS = new Set([0xffff])
+/** Inline PUA range (D21). */
+const PUA_START = 0xe000
+const PUA_END = 0xf8ff
+/** Correct Oracular copyright; the snapshot OFL header is wrong (D25). */
+const ORACULAR_COPYRIGHT = 'Copyright (c) Peichao, Qin, 2023. All rights reserved.'
+const OFL_MARKER = 'This Font Software is licensed under the SIL Open Font License, Version 1.1.'
 
 /** Sources-only attribution; the boundary sentence is product copy (locale). */
 const ATTRIBUTION =
-  '字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。'
+  '字形：Oracular（OFL-1.1）及其改名衍生 ZhenrenInline（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。'
 const BOUNDARY_SUFFIX = '兆纹为艺术化表现，非考古复原。'
 
 // ---------------------------------------------------------------------------
@@ -349,8 +362,10 @@ function emptyResolution() {
  * @param overrides human alias/headword adjudications
  * @param imageGlyphs D17 image-glyph manifest (char → provenance), or {}
  * @param vernacular  D18 headword → modern paraphrase drafts, or {}
+ * @param evolution   D23 headword → evolution spec drafts, or {}
+ * @param inlineMap   D21 glyphChar → PUA char (from build-inline-font), or {}
  */
-function buildOracle(source, overrides, imageGlyphs, vernacular) {
+function buildOracle(source, overrides, imageGlyphs, vernacular, evolution, inlineMap) {
   const { SW, TS, XZ, HAS_ORAC } = source
   const fontGlyphSet = new Set(HAS_ORAC)
   if (fontGlyphSet.size !== EXPECTED_GLYPH_COUNT) {
@@ -422,6 +437,7 @@ function buildOracle(source, overrides, imageGlyphs, vernacular) {
   // headwords
   const headwords = {}
   let vernacularWritten = 0
+  let evolutionWritten = 0
   for (const headword of [...glyphsByHeadword.keys()].sort(byCodepoint)) {
     const record = SW[headword]
     if (record === undefined) throw new Error(`invariant: headword ${headword} missing from SW`)
@@ -431,6 +447,9 @@ function buildOracle(source, overrides, imageGlyphs, vernacular) {
     // D18: merge human/batch paraphrase drafts; absent ones stay empty.
     const paraphrase = typeof vernacular[headword] === 'string' ? vernacular[headword].trim() : ''
     if (paraphrase !== '') vernacularWritten += 1
+    // D23: merge evolution drafts; absent ones stay null ("演变资料整理中").
+    const evolutionSpec = evolution[headword] ?? null
+    if (evolutionSpec !== null) evolutionWritten += 1
     headwords[headword] = {
       shuowen: {
         original: record.e,
@@ -441,21 +460,27 @@ function buildOracle(source, overrides, imageGlyphs, vernacular) {
       pinyin: typeof record.p === 'string' && record.p !== '' ? record.p : null,
       radical: typeof record.r === 'string' && record.r !== '' ? record.r : null,
       glyphChars: [...glyphsByHeadword.get(headword)].sort(byCodepoint),
+      evolution: evolutionSpec,
       sources: { shuowen: 'shuowen.org via yigezi' },
     }
   }
 
-  // glyphs (font + image, each tagged with its rendering source)
+  // glyphs (font + image, each tagged with its rendering source + inline PUA)
   const glyphs = {}
+  let inlineWritten = 0
   for (const char of [...glyphSet].sort(byCodepoint)) {
     const headword = glyphToHeadword.get(char) ?? null
     const resolvedBy = resolveResolvedBy(char, headword, ctx, manualHeadwords, resolution)
+    // D21: inline PUA from the font script; absent → null (no inline support).
+    const inline = typeof inlineMap[char] === 'string' ? inlineMap[char] : null
+    if (inline !== null) inlineWritten += 1
     const image = imageGlyphs[char]
     if (image !== undefined) {
       glyphs[char] = {
         headword,
         resolvedBy,
         source: 'image',
+        inline,
         image: {
           file: image.file,
           hustId: image.hustId,
@@ -466,7 +491,7 @@ function buildOracle(source, overrides, imageGlyphs, vernacular) {
         },
       }
     } else {
-      glyphs[char] = { headword, resolvedBy, source: 'font' }
+      glyphs[char] = { headword, resolvedBy, source: 'font', inline }
     }
   }
 
@@ -537,8 +562,37 @@ function buildOracle(source, overrides, imageGlyphs, vernacular) {
       imageSources,
       vernacularWritten,
       vernacularUnwritten: counts.headwords - vernacularWritten,
+      evolutionWritten,
+      evolutionUnwritten: counts.headwords - evolutionWritten,
+      inlineWritten,
+      inlineUnwritten: counts.glyphs - inlineWritten,
     },
+    clientGlyphs: buildClientGlyphs(glyphs, headwords),
   }
+}
+
+/**
+ * D23: the client-side reduced dataset, inlined into the client bundle by a
+ * tsdown virtual module. One entry per glyph; carries only what the daily-glyph
+ * widget and inline rendering need. Kept consistent with oracle.json.
+ */
+function buildClientGlyphs(glyphs, headwords) {
+  const entries = {}
+  for (const char of Object.keys(glyphs).sort(byCodepoint)) {
+    const record = glyphs[char]
+    const headword = record.headword
+    const hw = headword === null ? undefined : headwords[headword]
+    entries[char] = {
+      source: record.source,
+      headword,
+      pinyin: hw?.pinyin ?? null,
+      original: hw?.shuowen.original ?? null,
+      vernacular: hw?.shuowen.vernacular ?? '',
+      evolution: hw?.evolution ?? null,
+      inline: record.inline,
+    }
+  }
+  return entries
 }
 
 /**
@@ -593,7 +647,7 @@ function inspectFont(fontFile) {
 // ---------------------------------------------------------------------------
 
 /** Throw when the generated data violates the runtime contract. */
-function assertInvariants(data, fontChars, fontStats, imageGlyphs, dataDir) {
+function assertInvariants(data, fontChars, fontStats, imageGlyphs, dataDir, clientGlyphs) {
   const failures = []
   const glyphKeys = Object.keys(data.glyphs)
   const headwordKeys = Object.keys(data.headwords)
@@ -676,6 +730,62 @@ function assertInvariants(data, fontChars, fontStats, imageGlyphs, dataDir) {
   if (fontStats.glyphs !== EXPECTED_GLYPH_COUNT) {
     failures.push(`font glyph count ${fontStats.glyphs} != ${EXPECTED_GLYPH_COUNT}`)
   }
+
+  // D21: inline PUA must be a single char in range, unique across the corpus.
+  const seenInline = new Set()
+  for (const char of glyphKeys) {
+    const inline = data.glyphs[char].inline
+    if (inline === null || inline === undefined) continue
+    const cp = typeof inline === 'string' ? inline.codePointAt(0) : undefined
+    if (typeof inline !== 'string' || [...inline].length !== 1 || cp === undefined || cp < PUA_START || cp > PUA_END) {
+      failures.push(`glyph ${char} inline must be a single PUA char (U+E000-U+F8FF)`)
+      continue
+    }
+    if (seenInline.has(inline)) failures.push(`glyph ${char} inline duplicates another PUA codepoint`)
+    seenInline.add(inline)
+  }
+
+  // D23: evolution must be null or a well-formed {stages, status} spec.
+  for (const headword of headwordKeys) {
+    const evolution = data.headwords[headword].evolution
+    if (evolution === null || evolution === undefined) continue
+    if (evolution.status !== 'draft' && evolution.status !== 'reviewed') {
+      failures.push(`headword ${headword} evolution.status must be draft/reviewed`)
+    }
+    if (!Array.isArray(evolution.stages) || evolution.stages.length === 0) {
+      failures.push(`headword ${headword} evolution.stages must be a non-empty array`)
+      continue
+    }
+    for (const [i, stage] of evolution.stages.entries()) {
+      if (typeof stage?.name !== 'string' || stage.name === '' || typeof stage?.note !== 'string' || stage.note === '') {
+        failures.push(`headword ${headword} evolution.stages[${i}] needs non-empty name/note`)
+      }
+    }
+  }
+
+  // D23: client-glyphs.json must mirror oracle.json (keys, inline, evolution).
+  if (clientGlyphs !== undefined) {
+    const clientKeys = Object.keys(clientGlyphs)
+    if (clientKeys.length !== glyphKeys.length) {
+      failures.push(`client-glyphs count (${clientKeys.length}) != glyphs (${glyphKeys.length})`)
+    }
+    for (const char of glyphKeys) {
+      const entry = clientGlyphs[char]
+      if (entry === undefined) {
+        failures.push(`client-glyphs missing glyph ${char}`)
+        continue
+      }
+      if (entry.inline !== data.glyphs[char].inline) {
+        failures.push(`client-glyphs ${char} inline disagrees with oracle.json`)
+      }
+      const headword = data.glyphs[char].headword
+      const expectedEvolution = headword === null ? null : data.headwords[headword].evolution
+      if (JSON.stringify(entry.evolution) !== JSON.stringify(expectedEvolution)) {
+        failures.push(`client-glyphs ${char} evolution disagrees with oracle.json`)
+      }
+    }
+  }
+
   if (failures.length > 0) {
     throw new Error(`data invariants failed:\n- ${failures.join('\n- ')}`)
   }
@@ -758,6 +868,64 @@ function loadVernacular(file) {
   return parsed
 }
 
+/**
+ * Load the D23 evolution table (headword → {stages, status} draft).
+ * Human/batch artifact: created empty once, never overwritten by re-extraction.
+ * @returns {Record<string, object>}
+ */
+function loadEvolution(file) {
+  if (!fs.existsSync(file)) {
+    if (!CHECK_ONLY) writeFile(file, '{}\n')
+    return {}
+  }
+  const parsed = JSON.parse(readText(file))
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('evolution-overrides.json must be a JSON object keyed by headword')
+  }
+  for (const [headword, value] of Object.entries(parsed)) {
+    const where = `evolution-overrides.json.${headword}`
+    if (value === null || typeof value !== 'object') throw new Error(`${where} must be an object`)
+    if (value.status !== 'draft' && value.status !== 'reviewed') {
+      throw new Error(`${where}.status must be "draft" or "reviewed"`)
+    }
+    if (!Array.isArray(value.stages) || value.stages.length === 0) {
+      throw new Error(`${where}.stages must be a non-empty array`)
+    }
+    for (const [i, stage] of value.stages.entries()) {
+      if (typeof stage?.name !== 'string' || stage.name === '' || typeof stage?.note !== 'string' || stage.note === '') {
+        throw new Error(`${where}.stages[${i}] needs non-empty name/note`)
+      }
+    }
+  }
+  return parsed
+}
+
+/**
+ * Load the D21 inline PUA map produced by build-inline-font/build.py.
+ * Absent means "font script not run": every glyph gets inline:null and a warning
+ * is recorded. Extraction can run independently of the font script. Never created.
+ * @returns {{map: Record<string, string>, warning: string|null}}
+ */
+function loadInlineMap(file) {
+  if (!fs.existsSync(file)) {
+    return { map: {}, warning: 'inline-map.json absent; all glyphs inline:null (run build-inline-font)' }
+  }
+  const parsed = JSON.parse(readText(file))
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('inline-map.json must be a JSON object keyed by glyphChar')
+  }
+  const seen = new Set()
+  for (const [char, value] of Object.entries(parsed)) {
+    const cp = typeof value === 'string' ? value.codePointAt(0) : undefined
+    if (typeof value !== 'string' || [...value].length !== 1 || cp === undefined || cp < PUA_START || cp > PUA_END) {
+      throw new Error(`inline-map.json.${char} must be a single PUA char (U+E000-U+F8FF)`)
+    }
+    if (seen.has(value)) throw new Error(`inline-map.json.${char} duplicates a PUA codepoint`)
+    seen.add(value)
+  }
+  return { map: parsed, warning: null }
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -776,10 +944,15 @@ function main() {
   const imageGlyphs = loadImageGlyphs(imageGlyphsFile)
   const vernacularFile = path.join(OUT, 'vernacular-overrides.json')
   const vernacular = loadVernacular(vernacularFile)
-  const { data, report } = buildOracle(source, overrides, imageGlyphs, vernacular)
+  const evolutionFile = path.join(OUT, 'evolution-overrides.json')
+  const evolution = loadEvolution(evolutionFile)
+  const inlineMapFile = path.join(OUT, 'inline-map.json')
+  const { map: inlineMap, warning: inlineWarning } = loadInlineMap(inlineMapFile)
+  const { data, report, clientGlyphs } = buildOracle(source, overrides, imageGlyphs, vernacular, evolution, inlineMap)
+  if (inlineWarning !== null) report.inlineWarning = inlineWarning
 
   const font = inspectFont(fontFile)
-  assertInvariants(data, font.chars, font.stats, imageGlyphs, OUT)
+  assertInvariants(data, font.chars, font.stats, imageGlyphs, OUT, clientGlyphs)
 
   const manifest = {
     schemaVersion: SCHEMA_VERSION,
@@ -793,11 +966,21 @@ function main() {
       shuowen: 'shuowen.org via yigezi',
       images: 'HUST-OBC deciphered (arXiv 2401.15365)',
       hustGlyphsSha256: fs.existsSync(imageGlyphsFile) ? sha256File(imageGlyphsFile) : null,
+      inlineFontSha256: fs.existsSync(path.join(FONT_OUT, 'zhenren-inline.woff2'))
+        ? sha256File(path.join(FONT_OUT, 'zhenren-inline.woff2'))
+        : null,
+      inlineMapSha256: fs.existsSync(inlineMapFile) ? sha256File(inlineMapFile) : null,
     },
     counts: data.counts,
     font: font.stats,
+    content: {
+      vernacularWritten: report.vernacularWritten,
+      evolutionWritten: report.evolutionWritten,
+      inlineWritten: report.inlineWritten,
+    },
     licenses: {
       font: 'OFL-1.1',
+      inlineFont: 'OFL-1.1 (ZhenrenInline, renamed derivative of Oracular)',
       shuowen: 'Apache-2.0',
       yigezi: 'MIT',
       opencc: 'Apache-2.0 (build-time only)',
@@ -810,14 +993,23 @@ function main() {
     writeFile(path.join(OUT, 'oracle.json'), stableJson(data))
     writeFile(path.join(OUT, 'manifest.json'), stableJson(manifest))
     writeFile(path.join(OUT, 'extraction-report.json'), stableJson(report))
+    writeFile(path.join(OUT, 'client-glyphs.json'), stableJson(clientGlyphs))
     fs.mkdirSync(FONT_OUT, { recursive: true })
+    // Original font: byte-identical copy, never modified (D6).
     fs.copyFileSync(fontFile, path.join(FONT_OUT, 'orac.woff2'))
+    // D25: the snapshot OFL header names the wrong font (Kaiyuan Small Seal).
+    // Keep the OFL body but replace the header with the correct Oracular copyright.
     const oflDir = path.join(REFS, 'licenses')
-    const ofl = fs.existsSync(path.join(oflDir, 'OFL-1.1.txt'))
+    const oflSource = fs.existsSync(path.join(oflDir, 'OFL-1.1.txt'))
       ? path.join(oflDir, 'OFL-1.1.txt')
       : path.join(REFS, 'LICENSE')
-    fs.copyFileSync(ofl, path.join(FONT_OUT, 'OFL.txt'))
+    const oflText = readText(oflSource)
+    const markerAt = oflText.indexOf(OFL_MARKER)
+    if (markerAt < 0) throw new Error('OFL source missing license marker; cannot fix copyright header')
+    writeFile(path.join(FONT_OUT, 'OFL.txt'), `${ORACULAR_COPYRIGHT}\n\n${oflText.slice(markerAt)}`)
     fs.copyFileSync(path.join(REFS, 'THIRD_PARTY_NOTICES.md'), path.join(FONT_OUT, 'THIRD_PARTY_NOTICES.md'))
+    // The ZhenrenInline derivative + its OFL are produced by build-inline-font;
+    // extraction leaves them in place (does not regenerate or clobber them).
   }
 
   const summary = {
@@ -827,6 +1019,8 @@ function main() {
     unresolved: report.unresolved.length,
     aliasConflicts: report.aliasConflicts.length,
     font: font.stats,
+    content: manifest.content,
+    inlineWarning: report.inlineWarning ?? null,
     sourceHashes: {
       indexHtml: manifest.source.indexHtmlSha256.slice(0, 16),
       font: manifest.source.fontSha256.slice(0, 16),

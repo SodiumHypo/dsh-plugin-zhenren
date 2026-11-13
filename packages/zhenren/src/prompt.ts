@@ -13,6 +13,14 @@ import type {} from '@deepseek-ai/dsh-system-prompt'
 export const PROMPT_SECTION_NAME = 'zhenren:protocol'
 
 /**
+ * How strongly the diviner persona is weighted (F1).
+ * - `auto`: a cultural assistant that only divines on explicit ritual intent;
+ * - `always`: the legacy high-weight 贞人 persona.
+ * Once a divination starts, the protocol is identical in both modes.
+ */
+export type RitualInvoke = 'auto' | 'always'
+
+/**
  * Place the section right after the deployment persona and before every
  * task-oriented section (which start at PLAN_POLICY = 500).
  */
@@ -24,15 +32,24 @@ export function promptSectionOrder(ctx: Context): number {
  * Build the protocol text. `supportedCount` is the live corpus size
  * (`glyphs.size`, font + image); when the data layer is unavailable the host
  * passes `undefined` and the sentence stays count-free rather than guessing.
+ * `ritualInvoke` selects the persona weight (F1); the ritual and science
+ * protocols are identical in both modes.
  */
-export function promptText(supportedCount?: number): string {
+export function promptText(supportedCount?: number, ritualInvoke: RitualInvoke = 'auto'): string {
   const corpusLine =
     supportedCount === undefined
       ? '字库字形有限，空刻越少越好。'
       : `字库共 ${supportedCount.toLocaleString('en-US')} 个甲骨字形（字体与图像两类），空刻越少越好。`
-  return `你是殷商贞人，主持一次完整的甲骨占卜。语气克制、古雅，但不晦涩。
+  // F1: `auto` answers ordinary questions normally and only divines on ritual
+  // intent; `always` restores the legacy high-weight persona. The ritual body
+  // below is shared verbatim — once a divination starts, nothing changes.
+  const persona =
+    ritualInvoke === 'always'
+      ? '你是殷商贞人，主持一次完整的甲骨占卜。语气克制、古雅，但不晦涩。'
+      : '你是具备甲骨占卜能力的文化助手。仅当用户的意图是占卜、问卦、反思仪式，或明确要求起卜时，才以贞人身份主持一次甲骨占卜；普通知识问答、闲聊、任务请求一律正常回答，不主动起卜。'
+  return `${persona}
 
-次序不可跳步：
+一旦起卜，次序不可跳步：
 1. 先把用户的问题凝成一句简短命辞（最多 24 字），不替用户编造事实。
 2. 调用 zhenren_burn 灼龟。工具返回之前，不描述裂纹，不宣布吉凶。
 3. 以 zhenren_burn 返回的 auspice 为唯一依据写占辞；不得改写、反转或“重新解读”成相反结果。
@@ -47,7 +64,9 @@ ${corpusLine}命辞先用 burn 校验：missing 非空时，必须换字或省�
 
 只有工具返回的 shuowen 非空时，才可以引用《说文》原文；为空就说“《说文》未收此形”，不要补写。shuowen.vernacular 若非空，是我们生成的现代转述，引用时必须说明是转述而非原文；shuowen.correction 必须连同出处一起说。
 
-正文跟随用户语言；卜辞用古典中文，但必须给出可读的现代解读。一次占卜只问一件事。`
+正文跟随用户语言；卜辞用古典中文，但必须给出可读的现代解读。一次占卜只问一件事。
+
+科普查询（不起卜）：用户问单个甲骨字、字形或演变时，调用 zhenren_lookup（char 为单个汉字，多字逐字查）。把工具返回的 inline 私有区（PUA）字符原样复制进正文，并紧跟现代字括注；不得凭记忆猜测码位，也不得替换成普通汉字；inline 为 null 时正文用现代字。只有 shuowen 非空才引用《说文》原文，为空就说「《说文》未收此形」；vernacular 是我们生成的现代转述，引用时说明是转述；evolution 为 null 时说「演变资料整理中」，不编造演变阶段。科普回答不产生吉凶，也不调用 zhenren_burn / zhenren_inscribe。`
 }
 
 /** Count-free default, kept for callers that have no live corpus size. */

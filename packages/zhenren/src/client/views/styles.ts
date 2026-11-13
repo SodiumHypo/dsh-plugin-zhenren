@@ -140,6 +140,62 @@ export const glossMetaStyle: CSSProperties = {
   overflowWrap: 'anywhere',
 }
 
+/**
+ * Compact ambient dock entry (F3 daily glyph). Quieter than a ritual card: a
+ * single horizontal pill below the composer, not a stacked specimen. Reuses the
+ * same bone/ink palette so it reads as part of the same material world.
+ */
+export const dockStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  padding: '6px 12px',
+  border: `1px solid ${BONE_EDGE}`,
+  borderRadius: 8,
+  background: BONE,
+  color: INK,
+  fontFamily: 'ui-serif, "Songti SC", "Noto Serif CJK SC", serif',
+  fontSize: 12,
+  lineHeight: 1.5,
+}
+
+export const dockLabelStyle: CSSProperties = {
+  flex: '0 0 auto',
+  color: INK_SOFT,
+  fontSize: 10,
+  letterSpacing: '0.16em',
+}
+
+export const dockGlyphStyle: CSSProperties = {
+  flex: '0 0 auto',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 34,
+  height: 34,
+}
+
+export const dockCharStyle: CSSProperties = {
+  flex: '0 0 auto',
+  fontSize: 15,
+  letterSpacing: '0.04em',
+}
+
+export const dockNoteStyle: CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  color: INK_SOFT,
+  overflowWrap: 'anywhere',
+}
+
+export const dockProgressStyle: CSSProperties = {
+  flex: '0 0 auto',
+  color: INK_SOFT,
+  fontSize: 10,
+  letterSpacing: '0.08em',
+  whiteSpace: 'nowrap',
+}
+
 const AUSPICE_COLORS: Record<Auspice, string> = {
   吉: '#2f5d43',
   凶: '#7a2e24',

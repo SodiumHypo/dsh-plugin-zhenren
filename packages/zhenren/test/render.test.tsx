@@ -83,15 +83,17 @@ describe('BurnRow', () => {
     expect(waiting).toContain('burn.waiting')
   })
 
-  it('renders question, charge, omen and attribution in the result phase', async () => {
+  it('renders question, charge and omen in the result phase (license attribution omitted)', async () => {
     const meta = await burnMeta()
     const markup = render(Burn, { phase: 'result', block: resultBlock(meta), t })
     expect(markup).toContain('data-state="ok"')
     expect(markup).toContain('burn.question')
     expect(markup).toContain('近期是否适合出行？')
     expect(markup).toContain('贞：今其出，亡咎？')
-    expect(markup).toContain('OFL-1.1')
+    // License/copyright attribution lives in README/LICENSE only, not the card.
+    expect(markup).not.toContain('OFL-1.1')
     expect(markup).toContain('card.boundary')
+    expect(markup).toContain('card.corpus')
     expect(markup).toContain('<canvas')
     expect(markup).toContain('aria-label=')
     expect(markup).toContain('card.skip')
@@ -144,7 +146,7 @@ describe('InscribeRow', () => {
     expect(markup).toContain('data-state="ok"')
     expect(markup).toContain('贞今其出亡咎其吉亡咎')
     expect(markup).toContain('gloss.title')
-    expect(markup).toContain('OFL-1.1')
+    expect(markup).not.toContain('OFL-1.1')
     expect(markup).toContain('<canvas')
     expect(markup).toContain('card.skip')
   })

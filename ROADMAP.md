@@ -3,6 +3,23 @@
 > 基线：v1.0.0-alpha.1（2026-11-11）。核心链「问→命辞→灼→兆→刻→读」已完整落地。
 > 本文档只给方向，不是执行清单；契约变更动手前先按 CLAUDE.md 附录 F 补 ADR。
 
+## 进度快照（v2.0.0，2026-11-13）
+
+本轮在 `1.1.0-beta.1` 之上完成 F1–F4 全量，目标正式版 `2.0.0`。契约先行：D20–D25 已入 CLAUDE.md §7，并更正「模型可见的是 `output.render` 的 ContentBlock[]，不是原始 `value`」——F2 内联 PUA 必须进 lookup 的 render 文本。
+
+| 特性 | 状态 | 事实 |
+| --- | --- | --- |
+| F1 调用权重下放 | ✅ 代码完成 | 人格段重写为「具备甲骨占卜能力的文化助手」；新增 `ritualInvoke: auto \| always`（默认 auto，仅占卜意图起卜）；一旦起卜协议不变。提示词层改动，不 bump schema。 |
+| F2 正文内联字形 | ✅ 代码完成 | 构建期 fonttools 把 Oracular 重映射为改名衍生 ZhenrenInline（PUA U+E000–F8FF，203 图像字形 sbix 嵌入）；client `@font-face`（`unicode-range: U+E000-F8FF`）接入正文 font-stack；`zhenren_lookup` 工具 + 科普卡（keyed toolview）；render 携带 PUA 供模型原样复制。浏览器冒烟待端到端验证。 |
+| F3 每日一字 | ✅ 代码完成 | `conversation.composer.dock` 常驻条目；`zhenren.daily.v1` 一轮遍历整库（去重、满轮重置、次日更换、同日稳定、损坏重建）；展示字形 + 演变文字。 |
+| F4 更新与设置 | ✅ 代码完成 | `settings.general.item` id `zhenren`：更新检查开关、registry 选择（npmjs/npmmirror/自定义）、「清除本地配置」（二次确认，只清 `zhenren.*`）；唯一运行时网络豁免——每日至多一次 GET 公共 registry，失败静默、只提示不自动更新（D20/D24）。 |
+| 数据层 | ✅ 完成 | `schemaVersion` 升到 3：新增 `headwords[*].evolution`、`glyphs[*].inline`；产出 `client-glyphs.json`（tsdown 虚拟模块内联）、`inline-map.json`、`evolution-overrides.json`。 |
+| 测试与构建 | ✅ 全绿 | 148 测试（12 文件）全绿，typecheck 通过，clean build 产出完整 `lib/` 与 d.ts。 |
+
+数据计数不变：glyphs 1,628 / fontGlyphs 1,425 / imageGlyphs 203 / glossedGlyphs 1,441 / glyphOnly 187 / headwords 1,384 / sharedHeadwords 54 / aliases 762；演变草稿 222 字头，内联码位 1,628（含 203 图像 sbix）。
+
+**待验证（不阻塞代码完成，阻塞发布）**：profile 安装后的浏览器端到端冒烟——F2 PUA 在真实 markdown 渲染器存活、普通汉字不受影响、字体禁用时科普卡兜底、sbix 图像字形渲染/降级；F3 每日一字轮转；F4 设置行与更新检查 CORS。冒烟通过 + `npm pack` 审计后进入发布闸门（git/npm publish 需用户当场确认，publish 需 2FA OTP）。
+
 ## 进度快照（v1.1.0-beta.1，2026-11-11）
 
 本轮已构建并发布 `1.1.0-beta.1`（82 个测试全绿，typecheck 通过，`npm pack` 产出 3.2 MB / 291 文件）。
@@ -67,7 +84,7 @@
 ## 3. 不做
 
 - 不随包分发 HUST-OBC 全量图库；不做运行时 OCR / 相似度模型（torch 重依赖，违反 D9）。
-- 不做数据库、运行时网络请求、字形合成。
+- 不做数据库、字形合成；运行时零网络，唯一豁免是 F4 可选更新检查（每日至多一次 GET 公共 registry 版本元数据，可关闭、失败静默、不上传数据，D20）。
 - 不把卡片变字典浏览器；部首/声符检索仍按 CLAUDE.md 6.3 的触发条件。
 
 ## 4. 里程碑（粗粒度）

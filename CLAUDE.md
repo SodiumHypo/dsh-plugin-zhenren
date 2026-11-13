@@ -65,7 +65,7 @@
 - 通过 `ctx.tools.register(defineTool({...}))` 注册。
 - 关键字段：`name`、`description`、`parameters`、`output.schema`、`output.render`、`output.presentationMeta?`、`execute`、`presentCall?`、`presentResult?`。
 - `output.presentationMeta(args, value)` 是纯函数投影：只依赖参数与结果，必须可 JSON 序列化，会被持久化并随结果重放。
-- 模型看到的是 `value`；client 看到的是 `presentationMeta`。两者可以不同：模型看语义结果，client 看视觉规格。
+- 模型看到的是 `output.render(args, value)` 返回的 `ContentBlock[]`（即 `result.content`），**不是原始 `value`**；`value` 是执行局部的，不进入模型消息（核实于 `agent-loop/src/tool-calls.ts` 的 `appendToolResult` → `createToolResultMessage({ content: result.content })`）。client 看到的是 `presentationMeta`（`result.meta`，持久化重放）。两者可以不同：模型看 render 出的语义文本，client 看视觉规格。**凡需要模型复制进正文的内容（如 F2 的内联 PUA 字符），必须出现在 render 文本里。**
 - `presentCall` / `presentResult` 只支持固定卡片词汇（generic/terminal/diff/search/read/web），**不能表达 Canvas 仪式**。
 
 #### 2.1.3 内联自定义 UI
@@ -160,7 +160,7 @@
 - `orac.woff2`：397,236 字节；cmap 共 1,426 条，其中 1,425 条为真实字形码位，另 1 条是 U+FFFF 非字符（构建期不变量显式排除它）；1,315 个唯一字形；102 个字形被 110 个额外码位共享；unitsPerEm 2048；字形名 `uniXXXX`；所有字形非空。
 - 字体按 Unicode 码位映射，不按语义映射；共享字形意味着不同字可能画出同一形状。显示端没有问题，但导出/去重时不能假设“一字形一码位”。
 - `seal.woff2`：8,711,700 字节；10,249 个 cmap 条目；9,533 个唯一字形；不属于当前范围。
-- 字体名是 `Oracular`；yigezi 用 `@font-face` 直接加载。当前规划不修改、不重命名字体，见 3.9。
+- 字体名是 `Oracular`；yigezi 用 `@font-face` 直接加载。原字体原样用于卡片渲染，不修改；正文内联用构建期 OFL 改名衍生字体 `ZhenrenInline`（D21/D25），见 3.9。
 
 #### 2.2.3 字头解析
 
@@ -217,7 +217,7 @@ yigezi 的 `lookup(raw)` 大致行为：
 
 | 资产 | 许可 | 备注 |
 | --- | --- | --- |
-| Oracular 字体 | OFL-1.1 | 字体名可能涉及 Reserved Font Name；当前不修改、不子集化 |
+| Oracular 字体 | OFL-1.1 | 原样使用；构建期产出改名衍生 `ZhenrenInline`（D25）；name 表无 RFN 声明 |
 | shuowen.org 文本 | Apache-2.0 | `SW` 的 `e`、`p`、`r`、`v`、`f` 等 |
 | yigezi 代码/整理 | MIT | 数据抽取与 `XZ` 旁注 |
 | OpenCC | Apache-2.0 | 构建期使用；若分发 s2t 表需带声明 |
@@ -281,23 +281,28 @@ yigezi 的 `lookup(raw)` 大致行为：
 6. **生成字形记录**：每个 `glyphChar` 一条，写入 `headword`（可为 `null`）、`resolvedBy` 与 `source`。字体字形 `source: "font"`，`glyphChar` 必须是 1,425 字之一；图像字形（D17）`source: "image"`，来自 `data/hust-glyphs.json`（由 `scripts/expand-hust/build-images.py` 产出），并携带 `image` 出处元数据。图像字形的字头解析复用同一优先级链。
 7. **生成字头记录**：每个唯一 `headword` 一条，写入 `shuowen`、`pinyin`、`radical`、反向 `glyphChars`。字体层 1,202 个可释义字形归并为 1,181 个 `headword`；图像字形接入的字头并入同一张表。
 8. **合并白话转述**（D18）：读取 `data/vernacular-overrides.json`，把人工/批量草稿按 `headword` 合并进 `headwords[*].shuowen.vernacular`，全部标 `vernacularStatus: "draft"`。该文件是人工产物，重抽取不得覆盖；未命中的字头 `vernacular` 保持空串。
-9. **生成别名索引**：把没有独立字形的输入形式映射到 `glyphChar`：
+9. **合并演变**（D23）：读取 `data/evolution-overrides.json`，按 `headword` 合并进 `headwords[*].evolution`（`{stages: [{name, note}], status: "draft"}`）；未命中的字头 `evolution: null`。该文件是人工产物，重抽取不得覆盖；只描述字形演变，不伪造我们没有的字形图像。
+10. **合并内联码位**（D21）：读取 `data/inline-map.json`（由 `scripts/build-inline-font/build.py` 用 fonttools 做 PUA 重映射产出），把 PUA 字符写入 `glyphs[*].inline`；没有映射的字形 `inline: null`。文件缺失时全部为 `null` 并记录警告（抽取可独立于字体脚本运行）。
+11. **生成别名索引**：把没有独立字形的输入形式映射到 `glyphChar`：
    - `SW` 字头本身（当它不是字形之一时，如 `亾`、`䠶`）；
    - `TS` 中指向该字形的简体/异体；
    - OpenCC s2t 的简体形式；
    - 反向 `w` 的重文；
    - 人工别名（`kind: "alias"`）。
    - 键必须与字形集合（字体 + 图像）不相交；输入本身有字形时，运行期直接命中，不进别名表。
-10. **写文件**：`oracle.json`、`manifest.json`、`extraction-report.json`；如果人工别名表/转述表不存在，创建空表，不覆盖已有内容。
-11. **构建期不变量检查**：
+12. **写文件**：`oracle.json`、`manifest.json`、`extraction-report.json`、`client-glyphs.json`（D23，client 精简数据集：char / source / headword / pinyin / original / vernacular / evolution / inline，供每日一字与内联使用）；如果人工别名表/转述表/演变表不存在，创建空表，不覆盖已有内容。
+13. **构建期不变量检查**：
     - 字体字形恰好 1,425 条，键集合与字体 cmap 集合一致；`glyphs` 总数 = 1,425 + 图像字数；
     - 每个 `source: "image"` 字形必须有 `image` 出处，且对应 PNG 文件存在；图像字形键不与字体 cmap 重叠；
     - `headwords` 恰为 `glyphs` 中非空 `headword` 的去重集合；每个 `headword` 至少被一个字形引用；
     - 每个 `glyphs[*].headword` 要么为 `null`，要么存在于 `headwords`；
     - 每条 `headwords[*].shuowen.original` 非空；
     - `aliases` 的键不与字形集合重叠，值必须是存在的 `glyphChar`；
+    - `glyphs[*].inline` 要么为 `null`，要么是单个 PUA 字符（U+E000–U+F8FF）；非空 PUA 码位全表不重复；
+    - `headwords[*].evolution` 要么为 `null`，要么是 `{stages, status}`；`stages` 非空且每个 stage 的 `name`/`note` 非空；
+    - `client-glyphs.json` 条目与 `glyphs` 一一对应，`inline`/`evolution` 与 `oracle.json` 一致；
     - 被排除的音韵字段没有进入生成物。
-12. **复制字体**：原样复制 `orac.woff2`，同时复制 OFL 文本；不修改字体二进制。
+14. **复制字体**：原样复制 `orac.woff2`，同时复制 OFL 文本（版权头为 Oracular 的，D25）；不修改原字体二进制。衍生字体 `zhenren-inline.woff2` 由字体脚本产出后原样复制，附衍生说明。
 
 ### 3.3 主键与两层记录
 
@@ -360,7 +365,7 @@ exact glyph > alias > not found
 
 ```json
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "generatedAt": "2026-11-11",
   "source": {
     "yigezi": "snapshot path and hash",
@@ -384,7 +389,7 @@ exact glyph > alias > not found
 }
 ```
 
-`schemaVersion: 2`（D17）引入字形来源维度。`counts.glyphs = fontGlyphs + imageGlyphs`；`fontGlyphs` 恒为 1,425（字体 cmap），`imageGlyphs` 是 D17 精选图像字数。上例的 1,628 / 203 是首批扩容的示意值，实际以抽取产物为准。`glossedGlyphs`/`glyphOnly`/`headwords`/`sharedHeadwords`/`aliases` 随图像字形接入与人工裁定变化，运行时一律以 `glyphs.size` 等为权威，不硬编码。
+`schemaVersion: 3`（D21/D23）在 v2 基础上新增 `headwords[*].evolution` 与 `glyphs[*].inline`；loader 严格校验版本，旧数据文件走 `data-unavailable`。`schemaVersion: 2`（D17）引入字形来源维度。`counts.glyphs = fontGlyphs + imageGlyphs`；`fontGlyphs` 恒为 1,425（字体 cmap），`imageGlyphs` 是 D17 精选图像字数。上例的 1,628 / 203 是首批扩容的示意值，实际以抽取产物为准。`glossedGlyphs`/`glyphOnly`/`headwords`/`sharedHeadwords`/`aliases` 随图像字形接入与人工裁定变化，运行时一律以 `glyphs.size` 等为权威，不硬编码。
 
 字体层的 `counts` 与 2.2.4 的“自动解析”口径差 6 个字：`alias-overrides.json` 里带出处的 6 条 `kind: "headword"` 人工裁定（亡→亾、以→㠯、年→秊、春→萅、宜→宐、于→亏）把自动未匹配从 229 降到 223，释义字形从 1,196 升到 1,202，字头从 1,176 升到 1,181，共享字头从 20 升到 21。自动层的数字仍是审计基线，见 2.2.4 与 9A。
 
@@ -402,6 +407,16 @@ exact glyph > alias > not found
     "pinyin": "míng",
     "radical": "朙",
     "glyphChars": ["明", "朙"],
+    "evolution": {
+      "stages": [
+        { "name": "甲骨", "note": "从囧从月，窗牖与月交辉，会明亮之意。" },
+        { "name": "金文", "note": "承囧月结构，囧或简省。" },
+        { "name": "小篆", "note": "《说文》以朙为正篆，明为古文。" },
+        { "name": "隸書", "note": "囧讹变为日，遂成明。" },
+        { "name": "楷書", "note": "定形为明，朙退为异体。" }
+      ],
+      "status": "draft"
+    },
     "sources": {
       "shuowen": "shuowen.org via yigezi"
     }
@@ -413,13 +428,14 @@ exact glyph > alias > not found
 
 ```json
 {
-  "明": { "headword": "朙", "resolvedBy": "reverse-w", "source": "font" },
-  "朙": { "headword": "朙", "resolvedBy": "exact-sw", "source": "font" },
-  "其": { "headword": null, "resolvedBy": "none", "source": "font" },
+  "明": { "headword": "朙", "resolvedBy": "reverse-w", "source": "font", "inline": "\ue000" },
+  "朙": { "headword": "朙", "resolvedBy": "exact-sw", "source": "font", "inline": "\ue001" },
+  "其": { "headword": null, "resolvedBy": "none", "source": "font", "inline": "\ue002" },
   "福": {
     "headword": "福",
     "resolvedBy": "exact-sw",
     "source": "image",
+    "inline": null,
     "image": {
       "file": "glyphs/798f.png",
       "hustId": "1182",
@@ -433,6 +449,8 @@ exact glyph > alias > not found
 ```
 
 `image` 字段（仅 `source: "image"`）：`file` 是相对 `data/` 的 PNG 路径；`hustId` 是 HUST-OBC 字 ID；`source` 是原始出处名（新甲骨文编/国学大师/殷契文渊/HWOBC/六位数字编码）；`citation` 是文件名里的著录原文；`collection`/`group` 是从著录解析出的合集号与组类，无则 `null`。
+
+上例 `inline` 的 PUA 码位是示意值，实际由字体脚本按码位排序确定性分配（D21）。图像字形的 `inline` 取决于 sbix 嵌入结果：未嵌入时为 `null`，科普卡正常渲染并标注「图像字形暂不支持正文内联」。
 
 带古文字纠正的字头：
 
@@ -479,6 +497,8 @@ exact glyph > alias > not found
 - `glyphs[*].resolvedBy`：构建期解析路径，取 `manual-headword` / `exact-sw` / `reverse-w` / `opencc` / `ts` / `none`；审计用。
 - `glyphs[*].source`：`font` / `image`；决定渲染分支（D17）。
 - `glyphs[*].image`：仅 `source: "image"`；出处元数据，见上。
+- `glyphs[*].inline`：PUA 字符（U+E000–U+F8FF）或 `null`；正文内联码位（D21），构建期字体脚本产出；`null` 表示不支持内联（字体脚本未运行或图像字形 sbix 未嵌入），科普卡仍正常渲染。
+- `headwords[*].evolution`：`{stages: [{name, note}], status: 'draft' | 'reviewed'}` 或 `null`；字形演变的文字描述（D23），`name` 取 甲骨/金文/小篆/隸書/楷書；只描述、不携带字形图像；`null` 时 UI 显示「演变资料整理中」。
 - `aliases`：只用于把无字形输入归一到字形，不用于展示。
 - `shuowen.original`：逐字保留的《说文》原文；不删“凡……之屬皆从……”公式。
 - `shuowen.vernacular`：一句白话转述；是我们生成的辅助文本，不是 shuowen.org 原文；用 `vernacularStatus` 标记状态。
@@ -509,6 +529,8 @@ type OracleLookup =
       glyphSource: 'font' | 'image'
       headword: string | null
       shuowen: ShuowenGloss | null
+      inline: string | null
+      evolution: EvolutionSpec | null
       matchedBy: 'glyph' | 'alias'
       sources: SourceRef[]
     }
@@ -518,6 +540,11 @@ interface ShuowenGloss {
   vernacular: string
   vernacularStatus: 'draft' | 'reviewed'
   correction: { text: string; source: string } | null
+}
+
+interface EvolutionSpec {
+  stages: { name: string; note: string }[]
+  status: 'draft' | 'reviewed'
 }
 ```
 
@@ -540,6 +567,7 @@ interface ShuowenGloss {
 - 输入归一化：NFC、去空白、取单个 CJK 字；如果一个字符串包含多个字，由上层拆字后逐字查询，查询层本身只接受单字。
 - `normalized` 是查询最终落到的 `glyphChar`；`query` 是原始输入。模型和 UI 都要能看到两者的差异，避免“查的是简体、刻的是繁体”造成误解。`found: false` 时 `normalized` 只是清洗后的输入，不暗示存在近似字。
 - `found` 的判断发生在归一化之后：`贞` 本身不在字形库，但经 OpenCC/TS 归一为 `貞` 后命中，因此结果是 `found: true`，`glyphChar = 貞`。不能因为原字面不在字库就直接判 `found: false`。
+- `inline` 是正文内联 PUA 码位（D21）：模型必须从工具结果原样复制，不得凭记忆猜测；`null` 表示不支持内联，正文用现代字。`evolution` 来自字头记录；`headword: null` 时为 `null`。
 
 **为什么不是 `found` 同时要求有释义**：如果要求两者都有，223 个有甲骨字形的常见字（亡、以、年、春、其、于等）会被判为“未找到”，用户就无法刻出这些字。这既不符合字形事实，也会让卜辞变得残缺。正确做法是分开表达：字形在，刻；释义缺，诚实地说“《说文》未收此形”。
 
@@ -565,23 +593,31 @@ interface ShuowenGloss {
 
 ```text
 packages/zhenren/data/
-├── oracle.json              # 字形（字体 + 图像）+ 字头；host 运行时读取
+├── oracle.json              # 字形（字体 + 图像）+ 字头 + 内联码位 + 演变；host 运行时读取
 ├── alias-overrides.json     # 人工字头/别名裁决；构建期合并
 ├── vernacular-overrides.json# 白话转述草稿（D18）；构建期合并，人工产物
+├── evolution-overrides.json # 演变描述草稿（D23）；构建期合并，人工产物
 ├── hust-glyphs.json         # D17 图像字形清单 + 出处；build-images.py 产出，抽取读取
+├── inline-map.json          # D21 glyphChar→PUA 映射；build-inline-font/build.py 产出，抽取读取
+├── client-glyphs.json       # D23 client 精简数据集；抽取产出，tsdown 虚拟模块内联
 ├── manifest.json            # 计数、源哈希、许可、schemaVersion
 ├── extraction-report.json   # 解析报告、冲突、未匹配清单；审计用
 ├── glyphs/                  # D17 图像字形 PNG（每字一张，墨色归一化）
 │   └── <codepoint>.png
 └── fonts/
-    ├── orac.woff2           # 原样字体
-    └── OFL.txt              # OFL-1.1 文本
+    ├── orac.woff2           # 原样字体（卡片渲染）
+    ├── zhenren-inline.woff2 # D21/D25 改名衍生字体（正文内联，PUA）
+    ├── OFL.txt              # OFL-1.1 文本（Oracular 版权头）
+    └── ZhenrenInline-OFL.txt# 衍生字体 OFL 全文 + 衍生说明
 ```
 
 约束：
 
 - `oracle.json` 只含字形库记录（字体 1,425 + 图像字形）与字头记录，不含完整 9,815 条 `SW`。完整 `SW` 只在构建期读取。
 - `vernacular-overrides.json` 是人工/批量草稿产物，重抽取不得覆盖；条目按 `headword` 键，值为一句白话转述，全部 `draft`。
+- `evolution-overrides.json` 是人工/批量草稿产物，重抽取不得覆盖；条目按 `headword` 键，值为 `{stages, status}`，全部 `draft`；只描述演变，不携带字形图像（D23）。
+- `inline-map.json` 由 `scripts/build-inline-font/build.py` 产出（fonttools PUA 重映射 + sbix）；抽取只读不写；缺失时 `inline` 全 `null` 并记录警告，不阻断抽取（D21）。
+- `client-glyphs.json` 是抽取产物（非人工产物），每次重抽取重建；字段与 `oracle.json` 一致，体积控制在几百 KB（D23）。
 - `hust-glyphs.json` 与 `glyphs/` 由 `scripts/expand-hust/build-images.py` 产出；选字清单 `scripts/expand-hust/selection.json` 是人工产物，重跑不覆盖。
 - `alias-overrides.json` 是人工维护文件；重新抽取不得覆盖它。每条必须带 `kind`：
 
@@ -599,7 +635,7 @@ packages/zhenren/data/
 
 - `manifest.json` 是审计锚点：记录源文件哈希、yigezi 快照、OpenCC 版本、生成时间、计数、许可名称。运行时可选校验 `schemaVersion`。
 - `extraction-report.json` 不是运行时资产；它记录每个字的解析路径、229 个未匹配字、别名冲突。后续人工补别名时先看这份报告。
-- 字体与 OFL 文本必须一起发布；不能只发 `orac.woff2` 而不带许可。
+- 字体与 OFL 文本必须一起发布；不能只发字体而不带许可。原字体与衍生字体各自带 OFL 全文；衍生字体附改名与衍生说明（D25）。
 
 ### 3.8 运行时索引
 
@@ -626,7 +662,7 @@ host 启动时：
 
 当前数据层的许可边界：
 
-- **Oracular 字体**：OFL-1.1。原样使用，不修改、不重命名、不子集化。若未来必须子集化，先按 OFL 的 Reserved Font Name 规则处理，并重新评估署名。
+- **Oracular 字体**：OFL-1.1。原字体原样用于卡片渲染，不修改、不子集化。正文内联使用构建期改名衍生字体 `ZhenrenInline`（D25）：cmap 重映射到 PUA、改 family name、保留原版权（Copyright (c) Peichao, Qin, 2023）与 OFL 全文、增补衍生说明；name 表无 RFN 声明，改名仍按 OFL 惯例执行。若未来子集化，同样按 OFL 改名规则处理。
 - **shuowen.org 文本**：Apache-2.0。`shuowen.original` 是逐字引用；`vernacular` 是我们的现代转述，必须与原文区分；`correction` 来自 yigezi `XZ`，单独署名。
 - **yigezi**：MIT。数据抽取与 `XZ` 旁注需要署名。
 - **OpenCC**：Apache-2.0。只在构建期使用；如果分发了由它生成的 s2t 表，带 OpenCC 声明。
@@ -638,14 +674,14 @@ host 启动时：
 1. 仓库根目录 `THIRD_PARTY_NOTICES.md`：完整许可文本与来源说明。
 2. npm 包内 `NOTICE` / `LICENSE` / `OFL.txt`：随包发布。
 3. 数据文件 `manifest.json` 的 `attribution` 字段：机器可读。
-4. client 的“关于”卡片或卡片页脚：用户可见的一句话署名。
+4. `README.md` 的署名/许可章节：用户可见的完整署名（D26：会话卡片与正文不再渲染许可证字样）。
 5. 如果未来有 HTTP 端点直接提供字体或数据，再加响应头；当前工具结果是 JSON，不强行造响应头。
 
-“关于”卡片的文案基线：
+署名文案基线（D26 起仅落在 `README.md` / `THIRD_PARTY_NOTICES.md`，不在会话卡片或正文渲染）：
 
-> 字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。兆纹为艺术化表现，非考古复原。
+> 字形：Oracular（OFL-1.1）及其改名衍生 ZhenrenInline（OFL-1.1）、HUST-OBC 已释字图像（公有领域，arXiv 2401.15365）。《说文》文本：shuowen.org（Apache-2.0）。数据整理：yigezi（MIT）。兆纹为艺术化表现，非考古复原。
 
-这段文案是产品可见字符串，放在 locale 字典里，不要在组件里硬编码。
+会话卡片只保留功能性边界句（`card.boundary` 艺术约定声明、`card.corpus` 字形库字数）与学术出处引用（如 `yigezi:XZ`）；许可证/版权字样一律不进卡片页脚或正文（D26）。
 
 ### 3.10 数据演进
 
@@ -758,6 +794,7 @@ dsh-plugins/
 | prepare | host 内部纯函数 | 归一化、解析字形、校验命辞、生成 seed/灼点 | `PreparedDivination`（进程内，不持久化） |
 | burn | `zhenren_burn` 工具 | 生成兆纹规格、唯一吉凶、命辞字形表 | `BurnResult` + `presentationMeta` |
 | inscribe | `zhenren_inscribe` 工具 | 逐字校验、缺字占位、布局、刻辞节奏 | `InscribeResult` + `presentationMeta` |
+| lookup | `zhenren_lookup` 工具 | 单字查询：字形/说文/演变/内联码位（科普，非仪式） | `LookupResult` + `presentationMeta` |
 | present | client 视图 + 助手正文 | 播放动画、展示卜辞、释义、署名 | 可见卡片 + 会话文本 |
 | verify | `zhenren_verify`（未来） | 记录验辞，关联原卜 | `VerifyResult` + `presentationMeta` |
 
@@ -767,6 +804,7 @@ dsh-plugins/
 - `burn` 与 `inscribe` 分开，是为了让“兆象”先于“占辞”。模型先拿到 `auspice`，再写占辞，文字跟随兆象，而不是先写好答案再补裂纹。
 - `present` 不是工具，而是卡片与助手文本的组合；不需要为“展示”再发一次工具调用。
 - `verify` 只预留契约，不在当前范围实现；它不能改变已经发生的兆象，只能追加记录。
+- `lookup` 独立于仪式链：科普查询不产生 `divinationId`、不影响兆象；它返回的 `inline` 码位供模型穿插正文（D21）。
 
 ### 4.4 `zhenren_burn`
 
@@ -1086,6 +1124,7 @@ dsh-plugins/
 - `apply(ctx)` 注册：
   - `zhenren_burn` 工具；
   - `zhenren_inscribe` 工具；
+  - `zhenren_lookup` 工具（F2 科普查询，§4.13）；
   - 系统提示词段；
   - 可选 Config。
 - host 不注册 slot，不 import React，不读 DOM。
@@ -1096,7 +1135,10 @@ dsh-plugins/
 - `apply(ctx)` 通过 `ctx.slots.inject('tool.call.toolview', ...)` 注册：
   - `key: 'zhenren_burn'` → `BurnRow`
   - `key: 'zhenren_inscribe'` → `InscribeRow`
+  - `key: 'zhenren_lookup'` → `LookupRow`（科普卡，D21）
   - 未来 `key: 'zhenren_verify'` → `VerifyRow`
+- 通过 `conversation.composer.dock` 注册每日一字 widget（D22）；通过 `settings.general.item`（id `zhenren`）注册设置行（D24）。
+- 通过 `ctx.effect` 注入 `@font-face`（ZhenrenInline，data URL，`unicode-range: U+E000-F8FF`）并把字体加入正文 font-stack（D21）；effect 清理时移除 style 标签。
 - 视图只接收 `ToolCallViewProps`；不直接读 host 配置、不调用 host 数据层。
 - 结果阶段从 `block.meta` 读取 `presentationMeta`；开始阶段最多从 `block.argsRaw`/`args` 读初始文案；preparing 阶段显示“贞人正在灼龟……”。
 - 卡片挂在会话流里，不挂侧栏、不做全屏遮罩、不做全局 overlay。
@@ -1107,6 +1149,7 @@ dsh-plugins/
 - `output.render` 必须返回一段可读文本，例如：
   - burn：“贞人灼龟，兆象：中性。命辞：今其出，亡咎？”
   - inscribe：“卜辞已刻：贞：今其出，亡咎？其吉，亡咎。”
+  - lookup：“明（朙）· míng：照也。从月从囧。…… 内联字形：〔PUA〕（明）”（现代字 + 说文摘要 + 内联 PUA 字符；PUA 必须进 render，模型才能复制进正文，见 D21）
 - 当 client 半包未加载、slot 未注册、meta 损坏、字体加载失败时，generic 工具行仍然可读。
 - 这是硬要求：**没有动画，工具仍然有意义。**
 
@@ -1122,7 +1165,7 @@ dsh-plugins/
 
 建议的协议要点：
 
-1. **人格**：你是殷商贞人。语言克制、古雅，但不晦涩。你先问、再灼、再读、再刻，不跳步。
+1. **人格与调用权重（F1）**：你是具备甲骨占卜能力的文化助手。仅当用户意图是占卜/问卦/反思仪式，或明确要求起卜时，才以贞人身份走「问→灼→读→刻」；普通知识问答、闲聊、任务请求一律正常回答，不主动起卜。`ritualInvoke: 'always'` 时恢复高权重贞人人格。一旦起卜，先问、再灼、再读、再刻，不跳步。
 2. **命辞**：把用户的问题凝成一句简短的命辞；不替用户编造事实；不把现代判断塞进命辞。
 3. **文体**：卜辞是甲骨卜辞式的记录，不是仿古散文。短句直陈，每句二到六字；实词尽量用单字，避免现代双音节词与白话短语（出行→出，明日→翌，顺利→利，是否→其，近期→今），例如「明日出行是否顺利」写成「翌出，其吉」。不用「乎、哉、兮、矣、也、焉、耳」等语气词，不用骈偶、排比、感叹。表疑问不加「乎/吗」，写「其雨」而不是「其雨乎」；否定用「亡、弗、不」。
 4. **灼龟**：先调用 `zhenren_burn`；在工具返回前，不描述裂纹、不宣布吉凶。
@@ -1131,6 +1174,8 @@ dsh-plugins/
 7. **释义**：只有 `shuowen` 非空时才引用《说文》原文；为空时说“《说文》未收此形”或省略；白话转述标为现代转述；古文字纠正带出处。
 8. **边界**：兆纹吉凶是艺术约定，不是考古复原；占卜是反思仪式，不是超自然事实。用户追问时如实说明。
 9. **语言**：正文跟随用户语言；卜辞用古典中文，但要给现代解读。
+10. **科普与内联（F2）**：用户问单个甲骨字/字形/演变时，调用 `zhenren_lookup`；把返回的 `inline` PUA 字符原样复制进正文（不得凭记忆猜测码位），建议附现代字括注；`inline: null` 时用现代字并说明。科普回答不起卜。
+11. **演变诚实**：只引用 `evolution` 数据；为 `null` 时说「演变资料整理中」，不编造演变阶段。
 
 提示词段应短（几百字），不要重复工具参数，不要把 1,425 字表塞进去。顺序放在核心系统提示之后、任务型提示之前；具体 `order` 用 `getSectionOrder` 解析，不硬编码猜测值。
 
@@ -1147,6 +1192,7 @@ dsh-plugins/
 | `showShuowen` | boolean | true | 卡片是否展示《说文》原文入口 |
 | `locale` | string | `'zh-CN'` | UI 语言；古典文本不翻译 |
 | `divinerName` | string | `'鱼'` | 固定前辞 `<干支>卜，<name>贞：` 中的贞人名 |
+| `ritualInvoke` | `'auto' \| 'always'` | `'auto'` | 起卜权重：auto 仅在占卜意图时起卜；always 恢复高权重贞人人格（F1） |
 
 约束：
 
@@ -1165,7 +1211,7 @@ dsh-plugins/
 
 隐私：
 
-- 插件运行时零网络请求；不调用外部占卜 API，不做遥测，不把问题上传到第三方。
+- 插件运行时零网络请求，唯一豁免是 F4 更新检查（D20）：仅 GET 公共 npm registry 版本元数据，每本地日至多一次，可关闭，失败静默，不上传任何用户数据。不调用外部占卜 API，不做遥测，不把问题上传到第三方。
 - 问题文本留在 dsh 会话日志与模型上下文里；这是 dsh 本身的边界，插件不额外扩散。
 - 未来若做导出/分享，必须显式触发；导出物带出处与边界说明；不做后台自动上传。
 - 不在日志里额外打印用户问题；错误信息只带必要的 `divinationId` 与错误码。
@@ -1184,6 +1230,87 @@ dsh-plugins/
 | 动画被跳过/离屏 | 播放中断 | 暂停；回来时续播或直接到最终帧 |
 | reduced-motion | 用户不适合动画 | 直接最终帧；文本完整 |
 | 重复调用 | 模型重试 | 每次调用独立；旧卡片保留；不修改旧记录 |
+| 内联字体未加载 | 正文 PUA 显示豆腐块 | 科普卡与现代字括注兜底；不阻塞对话（D21） |
+| 更新检查失败/CORS 受阻 | 无更新提示 | 静默跳过，次日再试；不弹错（D20） |
+
+### 4.13 `zhenren_lookup`（F2 科普查询）
+
+独立于仪式链的单字查询工具：不产生 `divinationId`，不影响兆象，不修改任何记录。
+
+#### 输入
+
+```json
+{ "char": "明" }
+```
+
+- `char`：单个汉字（简体/繁体/异体均可）；多字输入返回 `invalid`，由上层拆字逐查。
+
+#### 输出（模型可见）
+
+`OracleLookup`（§3.5）加 `supportedCount` 与 `attribution`：
+
+```json
+{
+  "found": true,
+  "query": "明",
+  "normalized": "明",
+  "glyphChar": "明",
+  "glyphSource": "font",
+  "headword": "朙",
+  "shuowen": {
+    "original": "照也。从月从囧。凡朙之屬皆从朙。",
+    "vernacular": "明亮、照耀。",
+    "vernacularStatus": "draft",
+    "correction": null
+  },
+  "inline": "\ue000",
+  "evolution": {
+    "stages": [{ "name": "甲骨", "note": "从囧从月，窗牖与月交辉，会明亮之意。" }],
+    "status": "draft"
+  },
+  "matchedBy": "glyph",
+  "sources": [{ "kind": "oracleGlyph", "value": "Oracular (yigezi)" }],
+  "supportedCount": 1628,
+  "attribution": "字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域）；《说文》：shuowen.org（Apache-2.0）。"
+}
+```
+
+- `found: false` 时只带 `reason` / `supportedCount`，不猜字（§3.5）。
+- `inline` 是正文内联 PUA 码位（D21）；模型必须原样复制，不得猜测；`null` 时正文用现代字。示例码位为示意值。**`output.render` 文本必须携带该 PUA 字符并紧跟现代字括注**——dsh 把 render 内容（而非 `value`）交给模型（§2.1.2），PUA 不进 render 则模型无从复制。
+
+#### `presentationMeta`（client 可见）
+
+```json
+{
+  "version": 1,
+  "kind": "zhenren.lookup",
+  "query": "明",
+  "found": true,
+  "glyphChar": "明",
+  "glyphSource": "font",
+  "headword": "朙",
+  "pinyin": "míng",
+  "original": "照也。从月从囧。凡朙之屬皆从朙。",
+  "vernacular": "明亮、照耀。",
+  "vernacularStatus": "draft",
+  "correction": null,
+  "evolution": {
+    "stages": [{ "name": "甲骨", "note": "从囧从月，窗牖与月交辉，会明亮之意。" }],
+    "status": "draft"
+  },
+  "inline": "\ue000",
+  "supportedCount": 1628,
+  "attribution": "字形：Oracular（OFL-1.1）、HUST-OBC 已释字图像（公有领域）；《说文》：shuowen.org（Apache-2.0）。"
+}
+```
+
+约束：
+
+- lookup meta 独立版本（`version: 1`，`kind: "zhenren.lookup"`），不复用 burn/inscribe 的 v2；解析器 `parseLookupMeta` 校验失败走文本兜底。
+- meta 是 `value` 的纯投影；不读数据层、不抽随机数。
+- 科普卡用 `GlyphSource` 渲染字形（字体/图像双分支，D17）；字体失败时显示现代字 + 「字形未加载」，不画 tofu。
+- `inline: null` 且 `glyphSource: "image"` 时卡片标注「图像字形暂不支持正文内联」（D21）。
+- `output.render` 文本含现代字、说文摘要与内联 PUA 字符（D21）。PUA 必须进 render：dsh 把 render 内容交给模型（§2.1.2），这是模型复制内联字形的唯一来源。generic 行的豆腐块风险由全局注入的 ZhenrenInline 字体（`unicode-range: U+E000-F8FF`）与紧跟 PUA 的现代字括注共同兜底；科普卡始终提供可读的现代字 + 说文 + 演变。
 
 ---
 
@@ -1681,6 +1808,65 @@ mount
 - **后果**：页脚字数随数据版本动态、可重放；meta 保持纯函数；模型也被告知字形库边界（D14）。新增一个整数字段，meta 体积可忽略。
 - **替代**：meta 内调 `getIndex()`（拒绝：失败路径抛错风险、破坏纯投影）；locale 硬编码 N（拒绝：违反 D14 动态边界）；client 读 host 配置（拒绝：违反 §4.10）。
 
+### D20 有界运行时网络豁免（更新检查）
+
+- **背景**：F4 需要从 npm registry 提示新版本；D13 规定运行时零网络。
+- **决定**：唯一豁免是更新检查——仅 GET 公共 npm registry 的版本元数据（默认 `https://registry.npmjs.org/dsh-plugin-zhenren`，镜像 `https://registry.npmmirror.com/dsh-plugin-zhenren`，用户可自定义）；不上传任何问题、用户数据或遥测；每本地日至多一次（localStorage 缓存）；设置可关闭，关闭后零请求；失败静默，不弹错、不阻塞。**严禁使用临时代理地址；URL 必须与真实 registry 目标一致。**其余零网络约束不变。
+- **后果**：隐私边界仍然清晰；更新提示不主动更新、不自动下载、不自动安装。
+- **替代**：完全离线（拒绝：用户无法得知新版本）；host 侧轮询（拒绝：浏览器 GET 已足够，CORS 实施时验证，失败才降级 host fetch）。
+
+### D21 内联字形契约（PUA 字体 + 科普卡）
+
+- **背景**：F2 要求甲骨字形穿插在助手正文里；markdown 渲染器无插件级语法/节点注册点，DOM 被 fixtures 钉死，raw HTML 当纯文本。甲骨码位与普通汉字码位重合，不能只靠 font-family 区分「内联甲骨字」与「正常文本」。
+- **决定**：
+  - **构建期**：fonttools 把 Oracular 的 1,425 字形重映射到 PUA U+E000–F8FF，产出改名衍生字体 `ZhenrenInline`（D25）；`glyphChar → PUA` 映射写入 `data/inline-map.json`，抽取时合并进 `glyphs[*].inline` 与 `client-glyphs.json`。
+  - **client 注入**：`@font-face`（data URL，`unicode-range: U+E000-F8FF`）并把 `ZhenrenInline` 加入正文 font-stack（先例 `ui-theme/src/client/styles.ts`）；PUA 隔离，普通中文零影响。
+  - **模型输出**：`zhenren_lookup` 的 `output.render` 文本携带 `inline` PUA 字符并紧跟现代字括注；模型把它原样复制进正文（纯文本节点，渲染器原样保留），建议附现代字括注。模型不得凭记忆猜测码位。**事实更正（2026-11-13）**：dsh 的 `agent-loop/src/tool-calls.ts`（`appendToolResult` → `createToolResultMessage({ content: result.content })`）只把 `output.render` 的 `ContentBlock[]` 交给模型；`value` 是执行局部的，`presentationMeta` 仅供 UI。因此「render 不含 PUA」的旧约束（原 §4.8/§4.13）与 F2「模型从结果复制 PUA」的机制矛盾，已更正为 render 携带 PUA。generic 行豆腐块由全局 ZhenrenInline 字体 + 现代字括注 + 科普卡兜底。
+  - **科普卡**：keyed `tool.call.toolview`（key = `zhenren_lookup`）是数据/语义载体与字体失败兜底：始终提供现代字、说文、演变。
+  - **图像字形（203）**：用 fonttools sbix 嵌入同一 PUA 字体；嵌入失败或渲染不支持时 `inline: null`，科普卡正常渲染并标注「图像字形暂不支持正文内联」。
+  - 上游 markdown 扩展点为可选增强，非必需；**不做 DOM 事后替换 hack**。
+- **后果**：真·正文穿插、不依赖上游；字体失败时 PUA 显示豆腐块，由科普卡与现代字括注兜底；流式与重放一致（纯文本）。
+- **替代**：自定义 markdown 语法（拒绝：上游无注册点）；MutationObserver 事后替换（拒绝：与 React reconciliation 冲突、跨版本脆弱）；HTTP 图片内联（拒绝：`/plugins` 不服务任意静态资源，且违背零网络）。
+
+### D22 client 本地状态契约（每日一字 + 设置）
+
+- **背景**：F3 每日一字与 F4 更新缓存需要浏览器持久化；D5 约束的是 host 权威可变状态，不禁止 client UI 状态。
+- **决定**：插件命名空间 localStorage，键名稳定、与包安装路径无关：`zhenren.daily.v1`（`cycleStart` / `seen` / `today` / `schemaVersion`）、`zhenren.update.v1`（`checkedAt` / `latest`）、`zhenren.settings.v1`（`updateCheck` / `registry` / `customRegistry`）。每日一字**一轮 = 遍历整个字形库**：`seen` 去重，选字排除 `seen`，满轮开新轮（清空 `seen`、重置 `cycleStart`）；次日更换（本地时区日期），同日多次进入显示同一字；选字确定性（`cycleStart` + 已见数做种子，复用 shared/rng）；状态损坏/缺失重建新轮，不崩溃。「清除本地配置」只清插件命名空间，不动 cordis profile。
+- **后果**：覆盖更新天然保留用户状态（D24）；多标签页以 localStorage 事实为准；无跨设备同步。
+- **替代**：dsh-client-store 持久化（等价，localStorage 更直接）；sessionStorage（拒绝：不跨日）；host 侧存储（拒绝：无文档化 API，违背 D5）。
+
+### D23 演变数据层 + client 精简数据集
+
+- **背景**：F3 要展示「甲骨→金文→小篆→隸書→楷書」的演变；当前数据层没有演变数据；每日一字是 client widget，不经工具调用，读不到 host 的 oracle.json。
+- **决定**：新增构建期 `data/evolution-overrides.json`（按 `headword` 键，`{stages: [{name, note}], status: 'draft'}`），人工/批量草稿，重抽取不覆盖（同 D18 模式）；抽取合并进 `headwords[*].evolution`，`oracle.json` `schemaVersion` 升到 **3**。**只描述，不伪造我们没有的字形**；未覆盖字显示「演变资料整理中」。小篆字形默认不随包（`seal.woff2` +8.7 MB）；未来若随包须保留 OFL + OGDL 显名。构建期生成 `client-glyphs.json`（char / source / headword / pinyin / original / vernacular / evolution / inline），经 tsdown 虚拟模块内联，供每日一字使用。
+- **后果**：演变是内容债，高频约 200 字起步；client 数据集约几百 KB；schemaVersion 3 与旧数据文件不兼容（loader 严格校验，失败走 `data-unavailable`）。
+- **替代**：运行时让模型现写演变（拒绝：不可重放、有伪造风险）；client 读 host 文件（拒绝：无此通道）。
+
+### D24 更新与配置保留
+
+- **背景**：F4 要求覆盖更新保留用户配置，并在设置里留「清除本地配置」入口。
+- **决定**：覆盖更新只替换 npm 包；用户状态全部在包外的插件命名空间 localStorage（D22）与 profile 目录的 `cordis.patch.yml`（包外）。设置入口 `settings.general.item` id `zhenren`：更新检查开关（默认开）、registry 选择（npmjs / npmmirror / 自定义）、「清除本地配置」按钮（二次确认，只清 `zhenren.*` 键）。版本号构建期经 tsdown define 注入 client（`__ZHENREN_VERSION__`），与 `dist-tags.latest` 比较；只提示，不主动更新。
+- **后果**：更新不丢状态；清除按钮不影响 profile 配置；registry 可配置但严禁临时代理（D20）。
+- **替代**：包内状态文件（拒绝：覆盖更新即丢）；自动更新（拒绝：非目标）。
+
+### D25 放宽 D6：OFL 改名衍生字体
+
+- **背景**：D21 的正文内联需要 PUA 重映射字体；D6「不修改字体」是项目自我约束，非 OFL 硬禁令。OFL-1.1 允许改名衍生（避开 Reserved Font Names）。实测 Oracular name 表无 RFN 声明，版权行为 `Copyright (c) Peichao, Qin, 2023`。
+- **决定**：构建期用 fonttools 产出改名衍生字体 `ZhenrenInline`（cmap 重映射到 PUA、改 family name、保留原版权与 OFL 全文、增补衍生说明）；**原 Oracular 仍原样随包用于卡片渲染**；衍生字体仅服务正文内联。构建期产物，运行时零网络不变。同时修正 `data/fonts/OFL.txt` 的版权头错误（此前误用了开元小篆的版权头，应为 Oracular 的）。
+- **后果**：许可面多一个 OFL 衍生；notices / manifest 必须记录衍生关系与原版权；改名与分发遵守 OFL。
+- **替代**：原地修改原字体（拒绝：违背 OFL 改名要求与 D6 初衷）；不做内联（拒绝：F2 核心目标）。
+
+### D26 许可证署名退出会话正文与卡片
+
+- **背景**：v1.x 每张灼龟/刻辞/科普卡页脚与模型正文都渲染一行许可证署名（「字形：Oracular（OFL-1.1）…《说文》：shuowen.org（Apache-2.0）…」）。用户反馈会话里版权声明过多、妨碍观看，要求「把正文的所有许可证都去掉，只留在 README 和 LICENSE 里」。
+- **决定**：许可证/版权字样只保留在文件级——`README.md`、`LICENSE`、`THIRD_PARTY_NOTICES.md`、`data/manifest.json` 的 `attribution`、随包 OFL 文本。会话流卡片（burn/inscribe/lookup）页脚与模型正文不再渲染任何许可证字符串；移除 locale 键 `card.attribution`、`lookup.source*`，移除 lookup render 的「字形来源」行。`attribution` 字段仍保留在工具 `value` 与 `presentationMeta` 中（契约不变、解析器仍要求它，供审计与未来需要），只是不再显示。卡片保留功能性边界句（`card.boundary`、`card.corpus`）与学术出处引用（`yigezi:XZ` 等，D12 要求，非许可证）。本条取代 §3.9 署名落点第 4 项与「关于卡片」在会话内显示的做法。
+- **后果**：会话视觉干净；许可合规不变（OFL/Apache/MIT 署名仍随包与 README 完整提供，满足再分发要求）；纯展示层改动，数据契约与 schema 不变，无需 bump。旧会话 meta 仍带 `attribution`，新 client 不渲染它，重放兼容（已用 v1.1.0-beta.1 旧会话在 v2.0.0 client 重放验证）。
+- **替代**：保留每卡署名（拒绝：用户明确反对、妨碍阅读）；删除 value/meta 的 attribution 字段（拒绝：破坏契约稳定与审计，无收益）。
+
+### 决策记录（非 ADR）：F1 调用权重下放
+
+- 人格段重写为「具备甲骨占卜能力的文化助手」：仅当用户意图是占卜/问卦/反思仪式，或明确要求起卜时才走 burn→inscribe；普通知识问答、闲聊、任务请求一律正常回答，不主动起卜。新增配置 `ritualInvoke: 'auto' | 'always'`（默认 `auto`）；`always` 恢复旧版高权重行为。**一旦起卜，原有协议全部不变**（兆象先于占辞、`auspice` 唯一权威、缺字空刻、前辞 host 固定、不伪造）。提示词层改动，不属契约破坏，无需 bump schema。
+
 ---
 
 ## 8. 边界、非目标与开放问题
@@ -1855,24 +2041,35 @@ mount
 
 | 文件 | 职责 | 运行时？ |
 | --- | --- | --- |
-| `data/oracle.json` | 字形（字体 + 图像）+ 字头 + 别名索引 | 是（host） |
+| `data/oracle.json` | 字形（字体 + 图像）+ 字头 + 别名索引 + 内联码位 + 演变 | 是（host） |
 | `data/alias-overrides.json` | 人工字头/别名裁决 | 构建期 |
 | `data/vernacular-overrides.json` | 白话转述草稿（D18） | 构建期 |
+| `data/evolution-overrides.json` | 演变描述草稿（D23） | 构建期 |
 | `data/hust-glyphs.json` | D17 图像字形清单 + 出处 | 构建期 |
+| `data/inline-map.json` | D21 glyphChar→PUA 映射 | 构建期 |
+| `data/client-glyphs.json` | D23 client 精简数据集 | 构建期产出，client 内联 |
 | `data/glyphs/*.png` | D17 图像字形 | 是（client） |
 | `data/manifest.json` | 计数/哈希/许可 | 构建期 + 可选运行时校验 |
 | `data/extraction-report.json` | 解析报告/未匹配清单 | 构建期 |
-| `data/fonts/orac.woff2` | 字形 | 是（client） |
-| `data/fonts/OFL.txt` | 字体许可 | 随包发布 |
+| `data/fonts/orac.woff2` | 字形（卡片渲染） | 是（client） |
+| `data/fonts/zhenren-inline.woff2` | D21/D25 衍生字体（正文内联） | 是（client） |
+| `data/fonts/OFL.txt` | 原字体许可 | 随包发布 |
+| `data/fonts/ZhenrenInline-OFL.txt` | 衍生字体许可 + 衍生说明 | 随包发布 |
 | `scripts/extract-yigezi/` | 离线抽取 | 否 |
 | `scripts/expand-hust/` | D17 覆盖审计 / 选字 / 图像管线 | 否 |
+| `scripts/build-inline-font/` | D21 PUA 重映射 / sbix / 衍生字体 | 否 |
 | `src/data/schema.ts` | 记录/查询类型 | 编译期/运行时校验 |
 | `src/data/lookup.ts` | 别名查询 | 是（host） |
 | `src/ritual/crack.ts` | 兆纹生成 | 是（host） |
 | `src/tools/burn.ts` | `zhenren_burn` | 是（host） |
 | `src/tools/inscribe.ts` | `zhenren_inscribe` | 是（host） |
+| `src/tools/lookup.ts` | `zhenren_lookup`（F2 科普） | 是（host） |
 | `src/client/views/BurnRow.tsx` | 灼龟/兆纹卡片 | 是（client） |
 | `src/client/views/InscribeRow.tsx` | 刻辞卡片 | 是（client） |
+| `src/client/views/LookupRow.tsx` | 科普卡片（D21） | 是（client） |
+| `src/client/views/DailyGlyphDock.tsx` | 每日一字（D22） | 是（client） |
+| `src/client/views/SettingsRow.tsx` | 设置行（D24） | 是（client） |
+| `src/client/inline-font.ts` | @font-face 注入 + font-stack（D21） | 是（client） |
 | `src/client/render/cracks.ts` | 裂纹插值/绘制 | 是（client） |
 | `src/client/render/carve.ts` | 刻痕遮罩 | 是（client） |
 

@@ -86,6 +86,8 @@ function toFound(
     glyphSource,
     headword,
     shuowen,
+    inline: record.inline,
+    evolution: headwordRecord === undefined ? null : headwordRecord.evolution,
     matchedBy,
     sources,
   }

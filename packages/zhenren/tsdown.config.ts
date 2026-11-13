@@ -17,6 +17,7 @@ import { defineConfig, type TsdownPlugin } from 'tsdown'
 
 const root = dirname(fileURLToPath(import.meta.url))
 const PACKAGE_ID = 'dsh-plugin-zhenren'
+const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')) as { version: string }
 
 /** Serve `data/fonts/orac.woff2` as `virtual:orac-font`. */
 function oracFont(): TsdownPlugin {
@@ -66,6 +67,51 @@ function glyphImages(): TsdownPlugin {
   }
 }
 
+/**
+ * Serve the renamed OFL derivative `data/fonts/zhenren-inline.woff2` (D21/D25)
+ * as `virtual:zhenren-inline-font`. Its cmap is PUA-only (U+E000–F8FF), so the
+ * client gates it with `unicode-range` and prepends it to the prose font stack:
+ * normal Chinese is untouched, inline oracle glyphs resolve to the derivative.
+ */
+function inlineFont(): TsdownPlugin {
+  const virtualId = 'virtual:zhenren-inline-font'
+  const resolvedId = `\0${virtualId}`
+  return {
+    name: 'zhenren:inline-font',
+    resolveId(id) {
+      return id === virtualId ? resolvedId : null
+    },
+    load(id) {
+      if (id !== resolvedId) return null
+      const font = readFileSync(resolve(root, 'data/fonts/zhenren-inline.woff2'))
+      const url = `data:font/woff2;base64,${font.toString('base64')}`
+      return `export const ZHENREN_INLINE_FONT_URL = ${JSON.stringify(url)}`
+    },
+  }
+}
+
+/**
+ * Serve the compact client dataset `data/client-glyphs.json` (D23) as
+ * `virtual:client-glyphs`: a `glyphChar` → record map for the daily-glyph widget
+ * and inline lookups, which run client-side without a host tool call. The JSON
+ * is already a valid object literal, so it is embedded verbatim.
+ */
+function clientGlyphs(): TsdownPlugin {
+  const virtualId = 'virtual:client-glyphs'
+  const resolvedId = `\0${virtualId}`
+  return {
+    name: 'zhenren:client-glyphs',
+    resolveId(id) {
+      return id === virtualId ? resolvedId : null
+    },
+    load(id) {
+      if (id !== resolvedId) return null
+      const json = readFileSync(resolve(root, 'data/client-glyphs.json'), 'utf8')
+      return `export const CLIENT_GLYPHS = ${json}`
+    },
+  }
+}
+
 export default defineConfig([
   {
     name: `${PACKAGE_ID}:host`,
@@ -92,7 +138,9 @@ export default defineConfig([
     sourcemap: true,
     // Platform modules come from the loader's module table, never the bundle.
     external: ['react', 'react/jsx-runtime'],
-    plugins: [oracFont(), glyphImages()],
+    plugins: [oracFont(), glyphImages(), inlineFont(), clientGlyphs()],
+    // D24: the package version is baked in at build time for the update check.
+    define: { __ZHENREN_VERSION__: JSON.stringify(pkg.version) },
     outputOptions: {
       entryFileNames: 'client.js',
       banner: `window.__ModuleLoader__.load({ id: ${JSON.stringify(PACKAGE_ID)}, factory: (require) => {`,

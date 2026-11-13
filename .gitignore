@@ -11,6 +11,7 @@ Thumbs.db
 
 # Local verification artifacts (screenshots, Playwright snapshots, pack output).
 .playwright-mcp/
+.smoke/
 /*.png
 /*.yml
 packages/zhenren/*.tgz
