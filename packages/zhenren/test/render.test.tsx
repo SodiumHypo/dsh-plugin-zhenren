@@ -16,6 +16,7 @@ import { createInscribeTool } from '../src/tools/inscribe.js'
 import { createDivinationMemory } from '../src/tools/shared.js'
 import { BurnRow } from '../src/client/views/BurnRow.js'
 import { InscribeRow } from '../src/client/views/InscribeRow.js'
+import { SettingsSection } from '../src/client/views/SettingsSection.js'
 
 const dataDir = fileURLToPath(new URL('../data', import.meta.url))
 const index = loadOracleIndex({ dataDir })
@@ -172,5 +173,18 @@ describe('InscribeRow', () => {
     })
     expect(failed).toContain('data-state="error"')
     expect(failed).toContain('ToolError: invalid-arguments')
+  })
+})
+
+describe('SettingsSection', () => {
+  const Settings = SettingsSection as unknown as AnyComponent
+
+  it('renders the dedicated settings page with its controls (D27)', () => {
+    const markup = render(Settings, { t, close: () => {} })
+    expect(markup).toContain('data-settings="zhenren"')
+    expect(markup).toContain('settings.title')
+    expect(markup).toContain('id="zhenren-update-check"')
+    expect(markup).toContain('id="zhenren-registry"')
+    expect(markup).toContain('settings.clear')
   })
 })

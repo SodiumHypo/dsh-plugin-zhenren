@@ -1137,7 +1137,7 @@ dsh-plugins/
   - `key: 'zhenren_inscribe'` → `InscribeRow`
   - `key: 'zhenren_lookup'` → `LookupRow`（科普卡，D21）
   - 未来 `key: 'zhenren_verify'` → `VerifyRow`
-- 通过 `conversation.composer.dock` 注册每日一字 widget（D22）；通过 `settings.general.item`（id `zhenren`）注册设置行（D24）。
+- 通过 `conversation.composer.dock` 注册每日一字 widget（D22）；通过 `settings.section`（id `zhenren`，order 60）注册独立设置页（D24/D27）。
 - 通过 `ctx.effect` 注入 `@font-face`（ZhenrenInline，data URL，`unicode-range: U+E000-F8FF`）并把字体加入正文 font-stack（D21）；effect 清理时移除 style 标签。
 - 视图只接收 `ToolCallViewProps`；不直接读 host 配置、不调用 host 数据层。
 - 结果阶段从 `block.meta` 读取 `presentationMeta`；开始阶段最多从 `block.argsRaw`/`args` 读初始文案；preparing 阶段显示“贞人正在灼龟……”。
@@ -1845,7 +1845,7 @@ mount
 ### D24 更新与配置保留
 
 - **背景**：F4 要求覆盖更新保留用户配置，并在设置里留「清除本地配置」入口。
-- **决定**：覆盖更新只替换 npm 包；用户状态全部在包外的插件命名空间 localStorage（D22）与 profile 目录的 `cordis.patch.yml`（包外）。设置入口 `settings.general.item` id `zhenren`：更新检查开关（默认开）、registry 选择（npmjs / npmmirror / 自定义）、「清除本地配置」按钮（二次确认，只清 `zhenren.*` 键）。版本号构建期经 tsdown define 注入 client（`__ZHENREN_VERSION__`），与 `dist-tags.latest` 比较；只提示，不主动更新。
+- **决定**：覆盖更新只替换 npm 包；用户状态全部在包外的插件命名空间 localStorage（D22）与 profile 目录的 `cordis.patch.yml`（包外）。设置入口 `settings.section` id `zhenren`（2.0.1 起独立标签，见 D27；2.0.0 曾误用 `settings.general.item`）：更新检查开关（默认开）、registry 选择（npmjs / npmmirror / 自定义）、「清除本地配置」按钮（二次确认，只清 `zhenren.*` 键）。版本号构建期经 tsdown define 注入 client（`__ZHENREN_VERSION__`），与 `dist-tags.latest` 比较；只提示，不主动更新。
 - **后果**：更新不丢状态；清除按钮不影响 profile 配置；registry 可配置但严禁临时代理（D20）。
 - **替代**：包内状态文件（拒绝：覆盖更新即丢）；自动更新（拒绝：非目标）。
 
@@ -1862,6 +1862,13 @@ mount
 - **决定**：许可证/版权字样只保留在文件级——`README.md`、`LICENSE`、`THIRD_PARTY_NOTICES.md`、`data/manifest.json` 的 `attribution`、随包 OFL 文本。会话流卡片（burn/inscribe/lookup）页脚与模型正文不再渲染任何许可证字符串；移除 locale 键 `card.attribution`、`lookup.source*`，移除 lookup render 的「字形来源」行。`attribution` 字段仍保留在工具 `value` 与 `presentationMeta` 中（契约不变、解析器仍要求它，供审计与未来需要），只是不再显示。卡片保留功能性边界句（`card.boundary`、`card.corpus`）与学术出处引用（`yigezi:XZ` 等，D12 要求，非许可证）。本条取代 §3.9 署名落点第 4 项与「关于卡片」在会话内显示的做法。
 - **后果**：会话视觉干净；许可合规不变（OFL/Apache/MIT 署名仍随包与 README 完整提供，满足再分发要求）；纯展示层改动，数据契约与 schema 不变，无需 bump。旧会话 meta 仍带 `attribution`，新 client 不渲染它，重放兼容（已用 v1.1.0-beta.1 旧会话在 v2.0.0 client 重放验证）。
 - **替代**：保留每卡署名（拒绝：用户明确反对、妨碍阅读）；删除 value/meta 的 attribution 字段（拒绝：破坏契约稳定与审计，无收益）。
+
+### D27 设置入口独立成页（settings.section）
+
+- **背景**：v2.0.0 把设置挂在 `settings.general.item`（General 页里的一行）。dsh 的 slot 契约明确：`settings.general.item` 是「不需要独立页面的单个偏好」的加性座位，整页应走 `settings.section`（`ui-settings/src/client/contract/slots.ts`）。贞人设置含更新检查、更新源、清除本地配置三组控件加版本展示，是一个完整页面；挤在 General 里既不合规范也不易发现。
+- **决定**：注册 `settings.section`（id `zhenren`，order 60——排在内置 section 之后：account -10 / general 0 / models 10 / plugins 15 / agent-presets 20；`label` 取 registrant 本地化的 `settings.nav`），组件 `SettingsSection`（原 `SettingsRow` 改名）；移除 `settings.general.item` 注册。页面继承 shell 内容列的 padding（`0 24px 24px`）与主题，自绘标题与表单；shell 的 `close` runtime prop 不需要、不用。导航图标走 shell 对未知 id 的齿轮兜底（shell 只为内置 id 配图标）。
+- **后果**：设置左侧边栏出现独立「甲骨贞人」标签；settings-state / localStorage 契约不变（D22/D24）；纯展示层改动，数据契约与 schema 不变，无需 bump。locale 新增 `settings.nav` 键（zh「甲骨贞人」/ en「Oracle Diviner」）。
+- **替代**：保留 General 行（拒绝：违反 slot 契约语义、设置分散）；挂 `settings.plugins.tab`（拒绝：该座位服务内置插件清单页的协作 tab，独立功能页应自有导航条目）。
 
 ### 决策记录（非 ADR）：F1 调用权重下放
 
@@ -2068,7 +2075,7 @@ mount
 | `src/client/views/InscribeRow.tsx` | 刻辞卡片 | 是（client） |
 | `src/client/views/LookupRow.tsx` | 科普卡片（D21） | 是（client） |
 | `src/client/views/DailyGlyphDock.tsx` | 每日一字（D22） | 是（client） |
-| `src/client/views/SettingsRow.tsx` | 设置行（D24） | 是（client） |
+| `src/client/views/SettingsSection.tsx` | 独立设置页（D24/D27） | 是（client） |
 | `src/client/inline-font.ts` | @font-face 注入 + font-stack（D21） | 是（client） |
 | `src/client/render/cracks.ts` | 裂纹插值/绘制 | 是（client） |
 | `src/client/render/carve.ts` | 刻痕遮罩 | 是（client） |

@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-zhenren",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "甲骨贞人: an oracle-bone divination ritual plugin for DeepSeek Harness",
   "type": "module",
   "license": "MIT",

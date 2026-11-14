@@ -3,6 +3,10 @@
 > 基线：v1.0.0-alpha.1（2026-11-11）。核心链「问→命辞→灼→兆→刻→读」已完整落地。
 > 本文档只给方向，不是执行清单；契约变更动手前先按 CLAUDE.md 附录 F 补 ADR。
 
+## 进度快照（v2.0.1，2026-11-14）
+
+设置入口规范化（D27）：v2.0.0 误用 `settings.general.item`（General 页单行座位），2.0.1 改注册 `settings.section`（id `zhenren`，order 60），设置左侧边栏出现独立「甲骨贞人」标签；`SettingsRow` 改名 `SettingsSection`，locale 新增 `settings.nav`。纯展示层改动，settings-state / localStorage / 数据契约均不变。149 测试全绿（含 SettingsSection 静态渲染回归），typecheck 与 clean build 通过。
+
 ## 进度快照（v2.0.0，2026-11-13）
 
 本轮在 `1.1.0-beta.1` 之上完成 F1–F4 全量，目标正式版 `2.0.0`。契约先行：D20–D25 已入 CLAUDE.md §7，并更正「模型可见的是 `output.render` 的 ContentBlock[]，不是原始 `value`」——F2 内联 PUA 必须进 lookup 的 render 文本。

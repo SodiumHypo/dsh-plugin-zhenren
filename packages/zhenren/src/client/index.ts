@@ -16,7 +16,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-tool/client'
 // Type-only: pulls the `conversation.composer.dock` slot declaration (F3).
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-// Type-only: pulls the `settings.general.item` slot declaration (F4).
+// Type-only: pulls the `settings.section` slot declaration (F4, D27).
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import { TOOL_BURN, TOOL_INSCRIBE, TOOL_LOOKUP } from '../contract.js'
 import { installInlineFont } from './inline-font.js'
@@ -25,7 +25,7 @@ import { BurnRow } from './views/BurnRow.js'
 import { DailyGlyphDock } from './views/DailyGlyphDock.js'
 import { InscribeRow } from './views/InscribeRow.js'
 import { LookupRow } from './views/LookupRow.js'
-import { SettingsRow } from './views/SettingsRow.js'
+import { SettingsSection } from './views/SettingsSection.js'
 import { UpdateNotice } from './views/UpdateNotice.js'
 
 /** Services the browser half reads. */
@@ -61,9 +61,17 @@ export function apply(ctx: Context): void {
     { name: 'conversation.composer.dock', id: 'zhenren.update', order: 51, locale: NS },
     UpdateNotice,
   ))
-  // Preferences (F4): a General-section row owning the update check and local state.
-  ctx.slots.inject('settings.general.item', () => ctx.slots.register(
-    { name: 'settings.general.item', id: 'zhenren', order: 50, locale: NS },
-    SettingsRow,
+  // Preferences (F4, D27): a dedicated settings page owning the update check
+  // and local state; ordered after the built-in sections (account -10 …
+  // agent-presets 20). The nav label is registrant-localized.
+  ctx.slots.inject('settings.section', () => ctx.slots.register(
+    {
+      name: 'settings.section',
+      id: 'zhenren',
+      order: 60,
+      label: () => ctx.locale.bind(NS)('settings.nav'),
+      locale: NS,
+    },
+    SettingsSection,
   ))
 }

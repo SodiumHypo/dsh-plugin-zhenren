@@ -1,18 +1,20 @@
 /**
- * 甲骨贞人 settings row (CLAUDE.md §4.8, D24, F4).
+ * 甲骨贞人 settings section (CLAUDE.md §4.8, D24, D27, F4).
  *
- * A General-section preference row: the bounded update-check toggle (D20), the
- * registry choice (npmjs / npmmirror / custom), and a two-step 「清除本地配置」
- * that removes only this plugin's `zhenren.*` localStorage keys — never the
- * cordis profile or another plugin's state. All state lives outside the package,
- * so an overwrite update preserves it (D24).
+ * A dedicated `settings.section` page (its own tab in the settings nav rail):
+ * the bounded update-check toggle (D20), the registry choice (npmjs /
+ * npmmirror / custom), and a two-step 「清除本地配置」 that removes only this
+ * plugin's `zhenren.*` localStorage keys — never the cordis profile or another
+ * plugin's state. All state lives outside the package, so an overwrite update
+ * preserves it (D24).
  *
- * The row inherits the host settings panel's theme (no forced background or
- * palette): it is a form control, not a ritual card. It needs only the locale
- * seat; the slot's root-scoped runtime props are intentionally unused.
+ * The page inherits the host settings panel's theme and content-column
+ * padding (no forced background or palette): it is a form, not a ritual card.
+ * The shell owns nav chrome and the close affordance; the section draws its
+ * own heading and controls. The runtime `close` prop is intentionally unused.
  */
 import { useState, type CSSProperties, type ReactElement } from 'react'
-import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
+import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import {
   DEFAULT_SETTINGS,
   clearZhenrenStorage,
@@ -22,7 +24,7 @@ import {
   type ZhenrenSettings,
 } from '../settings-state.js'
 
-type SettingsRowProps = PropsLocale<'zhenren'>
+type SettingsSectionProps = PropsRuntime<'settings.section'> & PropsLocale<'zhenren'>
 
 const rowStyle: CSSProperties = {
   display: 'flex',
@@ -84,10 +86,10 @@ function storage(): Storage | undefined {
 }
 
 /**
- * Render the 甲骨贞人 preferences row.
- * @param props - the zhenren locale seat (the slot's other props are unused).
+ * Render the 甲骨贞人 settings page.
+ * @param props - the section runtime share (unused) plus the zhenren locale seat.
  */
-export function SettingsRow(props: SettingsRowProps): ReactElement {
+export function SettingsSection(props: SettingsSectionProps): ReactElement {
   const { t } = props
   const [settings, setSettings] = useState<ZhenrenSettings>(() => readSettings(storage()))
   const [confirming, setConfirming] = useState(false)
