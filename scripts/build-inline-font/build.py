@@ -7,7 +7,7 @@ embeds the D17 HUST-OBC image glyphs as an sbix bitmap strike.
 
 This is a BUILD-TIME tool. It is never imported by the plugin runtime.
 
-Outputs (all under packages/zhenren/data):
+Outputs (all under data/):
   fonts/zhenren-inline.woff2   renamed OFL derivative (PUA cmap + sbix)
   fonts/ZhenrenInline-OFL.txt  OFL-1.1 full text + derivative notice
   inline-map.json              glyphChar -> PUA char (consumed by extraction)

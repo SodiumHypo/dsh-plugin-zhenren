@@ -14,4 +14,10 @@ Thumbs.db
 .smoke/
 /*.png
 /*.yml
-packages/zhenren/*.tgz
+!/cordis.patch.yml
+*.tgz
+
+# Local guidance docs: kept on disk, never pushed.
+CLAUDE.md
+ROADMAP.md
+V2.0.0-PLAN.md
