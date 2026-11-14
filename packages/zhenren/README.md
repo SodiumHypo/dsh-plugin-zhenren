@@ -38,14 +38,14 @@ npm run extract
 从 npm 安装（发布后）：
 
 ```sh
-dsh plugin --profile demo add dsh-plugin-zhenren@2.0.0
+dsh plugin --profile demo add dsh-plugin-zhenren@2.0.1
 ```
 
 从 tarball 安装：
 
 ```sh
 cd packages/zhenren && npm pack
-dsh plugin --profile demo add ./dsh-plugin-zhenren-2.0.0.tgz
+dsh plugin --profile demo add ./dsh-plugin-zhenren-2.0.1.tgz
 ```
 
 从本地 checkout 安装（开发）：
