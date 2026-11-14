@@ -20,11 +20,20 @@ npm run extract          # 重新抽取 packages/zhenren/data/
 
 ## 安装到 dsh
 
+从 npm 安装到内置 `web` profile（`dsh web` 启动的那个）：
+
+```sh
+dsh plugin --profile web add dsh-plugin-zhenren
+dsh web
+```
+
+从本地 checkout 安装（开发）：
+
 ```sh
 npm install
 npm run build
-dsh plugin --profile demo add ./packages/zhenren
-dsh --profile demo
+dsh plugin --profile web add ./packages/zhenren
+dsh web
 ```
 
 细节、配置与边界见 [`packages/zhenren/README.md`](packages/zhenren/README.md)。

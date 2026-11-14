@@ -33,33 +33,35 @@ node packages/zhenren/scripts/extract-yigezi/index.mjs --check   # 数据不变�
 npm run extract
 ```
 
-## 安装到 dsh profile
+## 安装到 dsh
 
-从 npm 安装（发布后）：
+插件的 client 半包运行在 Web UI，正式安装目标是内置 `web` profile（`dsh web` 启动的那个）。使用自定义 profile 时，把下面命令里的 `web` 换成你的 profile 名即可。
+
+从 npm 安装（推荐）：
 
 ```sh
-dsh plugin --profile demo add dsh-plugin-zhenren@2.0.1
+dsh plugin --profile web add dsh-plugin-zhenren
 ```
 
 从 tarball 安装：
 
 ```sh
 cd packages/zhenren && npm pack
-dsh plugin --profile demo add ./dsh-plugin-zhenren-2.0.1.tgz
+dsh plugin --profile web add ./dsh-plugin-zhenren-2.0.1.tgz
 ```
 
 从本地 checkout 安装（开发）：
 
 ```sh
 npm install && npm run build          # 仓库根目录
-dsh plugin --profile demo add ./packages/zhenren
+dsh plugin --profile web add ./packages/zhenren
 ```
 
-安装后确认 bundle 层已激活：
+安装后确认 bundle 层已激活，再启动（bundle 成员变更需重启 profile 生效）：
 
 ```sh
-dsh --profile demo --dump-config     # 应看到 "# == dsh-plugin-zhenren" 层
-dsh --profile demo
+dsh --profile web --dump-config     # 应看到 "# == dsh-plugin-zhenren" 层
+dsh web
 ```
 
 `dsh.bundle.patch` 指向 `cordis.patch.yml`，它只插入一行：
